@@ -1,0 +1,1272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ChainX — Trust-Driven Supply Chain</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Mono:wght@300;400;500&family=Manrope:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black: #000;
+      --white: #fff;
+      --off-white: #f0ece4;
+      --cyan: #00dcc8;
+      --amber: #f5a623;
+      --green: #2ecc71;
+      --muted: #555;
+      --muted-light: #888;
+      --border: rgba(255,255,255,0.1);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--black);
+      color: var(--white);
+      font-family: 'Manrope', sans-serif;
+      font-weight: 400;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      z-index: 200;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 22px 60px;
+      mix-blend-mode: normal;
+    }
+    .nav-logo {
+      font-family: 'Playfair Display', serif;
+      font-weight: 900; font-size: 1.4rem;
+      letter-spacing: -0.01em; color: #fff;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .nav-logo-mark {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--cyan);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.85rem; color: #000; font-weight: 700;
+      font-family: 'DM Mono', monospace;
+    }
+    .nav-links { display: flex; gap: 36px; list-style: none; }
+    .nav-links a {
+      font-size: 0.8rem; font-weight: 500;
+      color: rgba(255,255,255,0.5); text-decoration: none;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      transition: color .2s;
+    }
+    .nav-links a:hover { color: #fff; }
+    .nav-cta {
+      padding: 10px 24px;
+      background: #fff;
+      color: #000;
+      font-family: 'Manrope', sans-serif;
+      font-size: 0.8rem; font-weight: 700;
+      border-radius: 999px;
+      cursor: pointer; text-decoration: none;
+      letter-spacing: 0.03em;
+      transition: background .2s, color .2s;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .nav-cta:hover { background: var(--cyan); color: #000; }
+
+    /* ── HERO ── */
+    #hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center;
+      padding: 100px 24px 60px;
+      overflow: hidden;
+    }
+
+    /* Orbiting card ring */
+    .orbit-ring {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+    .orbit-container {
+      position: absolute;
+      top: 50%; left: 50%;
+      width: 700px; height: 700px;
+      transform: translate(-50%, -50%);
+      animation: spin 40s linear infinite;
+    }
+    @keyframes spin {
+      from { transform: translate(-50%,-50%) rotate(0deg); }
+      to   { transform: translate(-50%,-50%) rotate(360deg); }
+    }
+    .orbit-card {
+      position: absolute;
+      width: 110px; height: 110px;
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .orbit-card .card-inner {
+      width: 100%; height: 100%;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 6px;
+      font-size: 0.55rem;
+      font-family: 'DM Mono', monospace;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.7);
+      /* counter-rotate so text stays upright */
+      animation: counter-spin 40s linear infinite;
+    }
+    @keyframes counter-spin {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(-360deg); }
+    }
+    .orbit-card .card-icon {
+      font-size: 1.6rem; line-height: 1;
+    }
+
+    /* Position each card on the circle */
+    .orbit-card:nth-child(1)  { top: calc(50% - 55px + 350px * sin(0deg));   left: calc(50% - 55px + 350px * cos(0deg)); }
+    .orbit-card:nth-child(2)  { top: calc(50% - 55px + 350px * sin(45deg));  left: calc(50% - 55px + 350px * cos(45deg)); }
+    .orbit-card:nth-child(3)  { top: calc(50% - 55px + 350px * sin(90deg));  left: calc(50% - 55px + 350px * cos(90deg)); }
+    .orbit-card:nth-child(4)  { top: calc(50% - 55px + 350px * sin(135deg)); left: calc(50% - 55px + 350px * cos(135deg)); }
+    .orbit-card:nth-child(5)  { top: calc(50% - 55px + 350px * sin(180deg)); left: calc(50% - 55px + 350px * cos(180deg)); }
+    .orbit-card:nth-child(6)  { top: calc(50% - 55px + 350px * sin(225deg)); left: calc(50% - 55px + 350px * cos(225deg)); }
+    .orbit-card:nth-child(7)  { top: calc(50% - 55px + 350px * sin(270deg)); left: calc(50% - 55px + 350px * cos(270deg)); }
+    .orbit-card:nth-child(8)  { top: calc(50% - 55px + 350px * sin(315deg)); left: calc(50% - 55px + 350px * cos(315deg)); }
+
+    /* Card backgrounds */
+    .oc-1 { background: linear-gradient(135deg,#0a1628,#132242); }
+    .oc-2 { background: linear-gradient(135deg,#1a0a0a,#2a1010); }
+    .oc-3 { background: linear-gradient(135deg,#0a1a0a,#102818); }
+    .oc-4 { background: linear-gradient(135deg,#1a1a0a,#2a2010); }
+    .oc-5 { background: linear-gradient(135deg,#0a0a1a,#101028); }
+    .oc-6 { background: linear-gradient(135deg,#1a0a1a,#281028); }
+    .oc-7 { background: linear-gradient(135deg,#0a1818,#0f2222); }
+    .oc-8 { background: linear-gradient(135deg,#181018,#221822); }
+
+    /* ── trust score mini-cards in orbit ── */
+    .score-mini {
+      font-family: 'DM Mono', monospace;
+      font-size: 1.2rem; font-weight: 500;
+      line-height: 1;
+    }
+    .score-mini.high { color: var(--green); }
+    .score-mini.mid  { color: var(--amber); }
+    .score-mini.cyan { color: var(--cyan); }
+
+    /* radial fade mask on ring edges */
+    .orbit-ring::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 60% 60% at 50% 50%, transparent 30%, #000 80%);
+      z-index: 2;
+    }
+
+    /* Hero text */
+    .hero-content { position: relative; z-index: 10; }
+
+    .hero-eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem; letter-spacing: 0.14em;
+      text-transform: uppercase; color: rgba(255,255,255,0.4);
+      margin-bottom: 32px;
+      animation: fadeUp .5s ease both;
+    }
+    .eyebrow-dot {
+      width: 5px; height: 5px; border-radius: 50%;
+      background: var(--cyan);
+      animation: blink 2s ease infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+
+    .hero-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(3.2rem, 8vw, 7rem);
+      font-weight: 900;
+      line-height: 1.0;
+      letter-spacing: -0.02em;
+      max-width: 860px;
+      margin: 0 auto 28px;
+      animation: fadeUp .65s .1s ease both;
+    }
+    .hero-title em {
+      font-style: italic;
+      color: var(--off-white);
+    }
+    .hero-title .accent-word {
+      position: relative; display: inline-block;
+    }
+    .hero-title .accent-word::after {
+      content: '';
+      position: absolute; bottom: 2px; left: 0; right: 0;
+      height: 3px;
+      background: var(--cyan);
+      border-radius: 2px;
+    }
+
+    .hero-sub {
+      font-size: clamp(0.95rem, 1.8vw, 1.15rem);
+      font-weight: 300;
+      color: rgba(255,255,255,0.45);
+      max-width: 500px;
+      margin: 0 auto 48px;
+      line-height: 1.7;
+      animation: fadeUp .65s .2s ease both;
+    }
+
+    .hero-actions {
+      display: flex; gap: 14px; flex-wrap: wrap; justify-content: center;
+      animation: fadeUp .65s .3s ease both;
+    }
+    .btn-primary {
+      padding: 15px 36px;
+      background: #fff;
+      color: #000;
+      font-family: 'Manrope', sans-serif;
+      font-weight: 700; font-size: 0.88rem;
+      border-radius: 999px; border: none; cursor: pointer;
+      text-decoration: none; letter-spacing: 0.02em;
+      transition: background .18s, transform .18s;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .btn-primary:hover { background: var(--cyan); transform: translateY(-2px); }
+    .btn-ghost {
+      padding: 15px 36px;
+      background: transparent;
+      color: rgba(255,255,255,0.6);
+      font-family: 'Manrope', sans-serif;
+      font-weight: 600; font-size: 0.88rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.18);
+      cursor: pointer; text-decoration: none;
+      transition: border-color .18s, color .18s;
+    }
+    .btn-ghost:hover { border-color: rgba(255,255,255,0.5); color: #fff; }
+
+    .hero-stats {
+      display: flex; gap: 56px; margin-top: 80px;
+      justify-content: center;
+      animation: fadeUp .65s .45s ease both;
+    }
+    .stat { text-align: center; }
+    .stat-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.4rem; font-weight: 900;
+      color: #fff; line-height: 1;
+    }
+    .stat-num sup { font-size: 1rem; color: var(--cyan); }
+    .stat-label {
+      font-size: 0.72rem; color: rgba(255,255,255,0.35);
+      letter-spacing: 0.1em; text-transform: uppercase; margin-top: 6px;
+    }
+    .stat-divider {
+      width: 1px; background: rgba(255,255,255,0.1);
+      align-self: stretch;
+    }
+
+    @keyframes fadeUp {
+      from { opacity:0; transform: translateY(20px); }
+      to   { opacity:1; transform: translateY(0); }
+    }
+
+    /* ── DIVIDER LINE ── */
+    .section-divider {
+      width: 100%;
+      height: 1px;
+      background: rgba(255,255,255,0.07);
+    }
+
+    /* ── MARQUEE TICKER ── */
+    .ticker-wrap {
+      padding: 18px 0;
+      border-top: 1px solid rgba(255,255,255,0.07);
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      overflow: hidden; white-space: nowrap;
+    }
+    .ticker-track {
+      display: inline-flex; gap: 0;
+      animation: ticker 25s linear infinite;
+    }
+    @keyframes ticker {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+    .ticker-item {
+      display: inline-flex; align-items: center; gap: 12px;
+      padding: 0 40px;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem; letter-spacing: 0.1em;
+      text-transform: uppercase; color: rgba(255,255,255,0.3);
+    }
+    .ticker-item span { color: var(--cyan); font-size: 0.9rem; }
+
+    /* ── FEATURES ── */
+    #features {
+      padding: 120px 60px;
+      max-width: 1200px; margin: 0 auto;
+    }
+    .section-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem; letter-spacing: 0.14em;
+      text-transform: uppercase; color: rgba(255,255,255,0.3);
+      margin-bottom: 20px;
+    }
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 4.5vw, 3.2rem);
+      font-weight: 900; line-height: 1.1;
+      letter-spacing: -0.02em;
+      max-width: 640px;
+    }
+    .section-title em { font-style: italic; color: rgba(255,255,255,0.55); }
+    .section-sub {
+      color: rgba(255,255,255,0.35);
+      font-size: 1rem; margin-top: 18px;
+      max-width: 480px; line-height: 1.7;
+    }
+
+    .features-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2px;
+      margin-top: 72px;
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 24px;
+      overflow: hidden;
+    }
+    .feat-cell {
+      padding: 52px 48px;
+      border: 1px solid rgba(255,255,255,0.07);
+      position: relative; overflow: hidden;
+      transition: background .3s;
+    }
+    .feat-cell:hover { background: rgba(255,255,255,0.02); }
+    .feat-cell.large {
+      grid-column: 1 / -1;
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 48px; align-items: center;
+    }
+    .feat-num {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem; letter-spacing: 0.12em;
+      color: rgba(255,255,255,0.25);
+      margin-bottom: 24px;
+    }
+    .feat-icon-wrap {
+      width: 52px; height: 52px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem; margin-bottom: 24px;
+    }
+    .feat-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem; font-weight: 700;
+      line-height: 1.2; margin-bottom: 12px;
+    }
+    .feat-desc {
+      font-size: 0.88rem; color: rgba(255,255,255,0.4);
+      line-height: 1.7;
+    }
+    .feat-highlight {
+      position: absolute; top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg,transparent,var(--cyan),transparent);
+      opacity: 0; transition: opacity .3s;
+    }
+    .feat-cell:hover .feat-highlight { opacity: 1; }
+
+    /* mini dashboard inside large feature cell */
+    .feat-visual {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 18px; padding: 24px;
+    }
+    .mini-kpis { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+    .mini-kpi {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 10px; padding: 12px;
+    }
+    .mini-kpi-label { font-size: 0.55rem; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.3); margin-bottom: 4px; font-family: 'DM Mono', monospace; }
+    .mini-kpi-val { font-family: 'DM Mono', monospace; font-size: 1.1rem; font-weight: 500; }
+    .mini-kpi-val.g { color: var(--green); }
+    .mini-kpi-val.c { color: var(--cyan); }
+    .mini-kpi-val.a { color: var(--amber); }
+    .mini-bars { display: flex; flex-direction: column; gap: 8px; }
+    .mini-bar-row { display: flex; align-items: center; gap: 10px; }
+    .mini-bar-label { font-size: 0.62rem; color: rgba(255,255,255,0.4); width: 90px; white-space: nowrap; font-family: 'DM Mono', monospace; }
+    .mini-bar-bg { flex: 1; height: 4px; background: rgba(255,255,255,0.06); border-radius: 999px; }
+    .mini-bar-fill { height: 100%; border-radius: 999px; }
+
+    /* ── SHOWCASE / DASHBOARD ── */
+    #showcase { padding: 0 60px 120px; }
+    .showcase-inner { max-width: 1200px; margin: 0 auto; }
+
+    .showcase-header {
+      display: flex; justify-content: space-between; align-items: flex-end;
+      margin-bottom: 48px;
+    }
+    .dashboard-frame {
+      background: #050505;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 24px; overflow: hidden;
+      box-shadow: 0 60px 120px rgba(0,0,0,0.8);
+    }
+    .frame-chrome {
+      display: flex; align-items: center; gap: 8px;
+      padding: 16px 20px;
+      background: rgba(255,255,255,0.02);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .chrome-btn { width: 10px; height: 10px; border-radius: 50%; }
+    .cb-r { background: #ff5f57; } .cb-y { background: #febc2e; } .cb-g { background: #28c840; }
+    .frame-url {
+      flex: 1; text-align: center;
+      font-family: 'DM Mono', monospace; font-size: 0.68rem;
+      color: rgba(255,255,255,0.2);
+    }
+    .frame-body {
+      display: grid; grid-template-columns: 200px 1fr;
+      min-height: 460px;
+    }
+    .frame-sidebar {
+      border-right: 1px solid rgba(255,255,255,0.06);
+      padding: 20px 14px;
+    }
+    .sb-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.58rem; letter-spacing: 0.12em;
+      text-transform: uppercase; color: rgba(255,255,255,0.2);
+      padding: 0 8px; margin-bottom: 8px; margin-top: 16px;
+    }
+    .sb-item {
+      display: flex; align-items: center; gap: 9px;
+      padding: 8px 10px; border-radius: 7px;
+      font-size: 0.76rem; color: rgba(255,255,255,0.35);
+      cursor: pointer; margin-bottom: 1px;
+      transition: background .15s, color .15s;
+    }
+    .sb-item.active { background: rgba(0,220,200,0.1); color: var(--cyan); }
+    .sb-item:hover:not(.active) { background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.7); }
+    .frame-main { padding: 28px; }
+    .frame-topbar {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 24px;
+    }
+    .frame-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem; font-weight: 700;
+    }
+    .live-badge {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.62rem; padding: 4px 10px;
+      background: rgba(245,166,35,0.12);
+      border: 1px solid rgba(245,166,35,0.25);
+      border-radius: 999px; color: var(--amber);
+      display: flex; align-items: center; gap: 5px;
+    }
+    .live-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--amber); animation: blink 1.5s infinite; }
+    .kpi-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 20px; }
+    .kpi-box {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 12px; padding: 14px;
+    }
+    .kpi-label { font-size: 0.62rem; color: rgba(255,255,255,0.3); letter-spacing: 0.06em; text-transform: uppercase; font-family: 'DM Mono', monospace; }
+    .kpi-val { font-family: 'DM Mono', monospace; font-size: 1.5rem; margin-top: 4px; }
+    .kpi-val.g { color: var(--green); } .kpi-val.c { color: var(--cyan); } .kpi-val.a { color: var(--amber); }
+    .kpi-delta { font-size: 0.6rem; color: var(--green); margin-top: 2px; }
+
+    .stakes-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 18px; }
+    .stake {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 10px; padding: 12px;
+    }
+    .stake-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+    .stake-name { font-size: 0.72rem; font-weight: 600; }
+    .stake-role { font-size: 0.58rem; color: rgba(255,255,255,0.3); margin-top: 2px; font-family: 'DM Mono', monospace; }
+    .trust-pill { font-family: 'DM Mono', monospace; font-size: 0.62rem; padding: 3px 7px; border-radius: 5px; }
+    .tp-g { background: rgba(46,204,113,0.12); color: var(--green); border: 1px solid rgba(46,204,113,0.25); }
+    .tp-a { background: rgba(245,166,35,0.12); color: var(--amber); border: 1px solid rgba(245,166,35,0.25); }
+    .bar-bg { height: 3px; background: rgba(255,255,255,0.06); border-radius: 999px; margin-top: 6px; }
+    .bar-fill { height: 100%; border-radius: 999px; }
+    .bf-g { background: linear-gradient(90deg,#2ecc71,#1abc9c); }
+    .bf-a { background: linear-gradient(90deg,#f5a623,#e67e22); }
+
+    .graph-box {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 10px; padding: 14px;
+    }
+    .graph-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .graph-name { font-size: 0.7rem; font-weight: 600; }
+    .graph-legend { display: flex; gap: 10px; }
+    .gl-item { display: flex; align-items: center; gap: 4px; font-size: 0.56rem; color: rgba(255,255,255,0.3); font-family: 'DM Mono', monospace; }
+    .gl-dot { width: 5px; height: 5px; border-radius: 50%; }
+    .svg-graph { width: 100%; height: 80px; }
+
+    /* ── WHY / COMPARISON ── */
+    #why { padding: 0 60px 120px; max-width: 1200px; margin: 0 auto; }
+    .why-layout {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 2px; margin-top: 64px;
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 24px; overflow: hidden;
+    }
+    .why-panel {
+      padding: 52px 48px;
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+    .why-panel.dark { background: transparent; }
+    .why-panel.lit  { background: rgba(0,220,200,0.04); border-color: rgba(0,220,200,0.15); }
+    .why-tag {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem; letter-spacing: 0.12em;
+      text-transform: uppercase; color: rgba(255,255,255,0.25);
+      margin-bottom: 16px;
+    }
+    .why-panel.lit .why-tag { color: var(--cyan); }
+    .why-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem; font-weight: 700;
+      margin-bottom: 24px; line-height: 1.3;
+    }
+    .why-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+    .why-list li {
+      display: flex; align-items: flex-start; gap: 10px;
+      font-size: 0.85rem; color: rgba(255,255,255,0.45); line-height: 1.55;
+    }
+    .why-list li::before {
+      content: '—';
+      color: rgba(255,255,255,0.18); flex-shrink: 0; margin-top: 1px;
+    }
+    .why-panel.lit .why-list li { color: rgba(255,255,255,0.65); }
+    .why-panel.lit .why-list li::before { content: '✓'; color: var(--cyan); }
+
+    .why-full {
+      grid-column: 1 / -1;
+      padding: 52px 48px;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      display: flex; align-items: center; gap: 48px;
+    }
+    .why-full-icon {
+      font-size: 3rem; flex-shrink: 0;
+      opacity: .5;
+    }
+    .why-full p {
+      font-size: 0.9rem; color: rgba(255,255,255,0.4);
+      line-height: 1.75; max-width: 700px; margin-top: 8px;
+    }
+
+    /* ── TESTIMONIALS SCROLL ── */
+    #testimonials { padding: 120px 0; overflow: hidden; }
+    .testi-header { text-align: center; margin-bottom: 64px; padding: 0 60px; }
+    .testi-scroll-outer { overflow: hidden; }
+    .testi-track {
+      display: flex; gap: 20px;
+      animation: tscroll 35s linear infinite;
+      width: max-content;
+    }
+    .testi-track:hover { animation-play-state: paused; }
+    @keyframes tscroll {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+    .testi-card {
+      flex-shrink: 0; width: 320px;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 20px; padding: 32px;
+    }
+    .testi-quote {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.95rem; line-height: 1.6;
+      color: rgba(255,255,255,0.7); margin-bottom: 24px;
+      font-style: italic;
+    }
+    .testi-author { display: flex; align-items: center; gap: 12px; }
+    .testi-avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: rgba(0,220,200,0.15);
+      border: 1px solid rgba(0,220,200,0.3);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem; font-weight: 700; color: var(--cyan);
+      font-family: 'DM Mono', monospace;
+    }
+    .testi-name { font-size: 0.82rem; font-weight: 600; }
+    .testi-role { font-size: 0.7rem; color: rgba(255,255,255,0.3); font-family: 'DM Mono', monospace; margin-top: 2px; }
+
+    /* ── CTA SECTION ── */
+    #cta {
+      margin: 0 60px 120px;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 32px;
+      padding: 100px 80px;
+      text-align: center;
+      position: relative; overflow: hidden;
+    }
+    #cta::before {
+      content: '';
+      position: absolute; top: -200px; left: 50%; transform: translateX(-50%);
+      width: 600px; height: 400px;
+      background: radial-gradient(ellipse, rgba(0,220,200,0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .cta-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 5vw, 3.8rem);
+      font-weight: 900; line-height: 1.1;
+      letter-spacing: -0.02em;
+      margin-bottom: 20px;
+    }
+    .cta-sub { color: rgba(255,255,255,0.35); font-size: 1rem; margin-bottom: 40px; max-width: 440px; margin-left: auto; margin-right: auto; }
+    .cta-btns { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid rgba(255,255,255,0.07);
+      padding: 60px 60px 40px;
+    }
+    .footer-inner {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      margin-bottom: 48px;
+      flex-wrap: wrap; gap: 32px;
+    }
+    .footer-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem; font-weight: 900;
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 8px;
+    }
+    .footer-tagline { font-size: 0.8rem; color: rgba(255,255,255,0.3); }
+    .footer-links { display: flex; gap: 28px; flex-wrap: wrap; align-items: center; }
+    .footer-links a {
+      font-size: 0.8rem; color: rgba(255,255,255,0.35);
+      text-decoration: none; transition: color .15s;
+      letter-spacing: 0.04em;
+    }
+    .footer-links a:hover { color: #fff; }
+    .footer-badge {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.62rem; letter-spacing: 0.1em;
+      color: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.1);
+      padding: 6px 14px; border-radius: 999px;
+    }
+    .footer-bottom {
+      display: flex; justify-content: space-between; align-items: center;
+      padding-top: 24px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      font-size: 0.75rem; color: rgba(255,255,255,0.2);
+      font-family: 'DM Mono', monospace;
+    }
+
+    /* Scroll reveal */
+    .reveal { opacity: 0; transform: translateY(24px); transition: opacity .7s ease, transform .7s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      nav { padding: 18px 24px; }
+      .nav-links { display: none; }
+      #features, #showcase, #why { padding-left: 24px; padding-right: 24px; }
+      .features-layout, .why-layout { grid-template-columns: 1fr; }
+      .feat-cell.large { grid-template-columns: 1fr; }
+      .why-full { flex-direction: column; }
+      #cta { margin: 0 24px 80px; padding: 60px 32px; }
+      footer { padding: 48px 24px 32px; }
+      .footer-inner { flex-direction: column; }
+      .orbit-container { width: 500px; height: 500px; }
+      .orbit-card { width: 85px; height: 85px; }
+      .orbit-card:nth-child(1)  { top: calc(50% - 42px + 250px * sin(0deg));   left: calc(50% - 42px + 250px * cos(0deg)); }
+      .orbit-card:nth-child(2)  { top: calc(50% - 42px + 250px * sin(45deg));  left: calc(50% - 42px + 250px * cos(45deg)); }
+      .orbit-card:nth-child(3)  { top: calc(50% - 42px + 250px * sin(90deg));  left: calc(50% - 42px + 250px * cos(90deg)); }
+      .orbit-card:nth-child(4)  { top: calc(50% - 42px + 250px * sin(135deg)); left: calc(50% - 42px + 250px * cos(135deg)); }
+      .orbit-card:nth-child(5)  { top: calc(50% - 42px + 250px * sin(180deg)); left: calc(50% - 42px + 250px * cos(180deg)); }
+      .orbit-card:nth-child(6)  { top: calc(50% - 42px + 250px * sin(225deg)); left: calc(50% - 42px + 250px * cos(225deg)); }
+      .orbit-card:nth-child(7)  { top: calc(50% - 42px + 250px * sin(270deg)); left: calc(50% - 42px + 250px * cos(270deg)); }
+      .orbit-card:nth-child(8)  { top: calc(50% - 42px + 250px * sin(315deg)); left: calc(50% - 42px + 250px * cos(315deg)); }
+      .frame-body { grid-template-columns: 1fr; }
+      .frame-sidebar { display: none; }
+      .hero-stats { gap: 28px; }
+      .showcase-header { flex-direction: column; align-items: flex-start; gap: 24px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-logo">
+      <div class="nav-logo-mark">CX</div>
+      ChainX
+    </div>
+    <ul class="nav-links">
+      <li><a href="#features">Features</a></li>
+      <li><a href="#showcase">Platform</a></li>
+      <li><a href="#testimonials">Stories</a></li>
+      <li><a href="#why">Why ChainX</a></li>
+    </ul>
+    <a href="#cta" class="nav-cta">↓ Get Access</a>
+  </nav>
+
+  <!-- HERO -->
+  <section id="hero">
+    <!-- Orbiting ring of stakeholder cards -->
+    <div class="orbit-ring">
+      <div class="orbit-container">
+        <div class="orbit-card oc-1">
+          <div class="card-inner">
+            <div class="card-icon">🏭</div>
+            <span>Manufacturer</span>
+            <div class="score-mini high">91.2</div>
+          </div>
+        </div>
+        <div class="orbit-card oc-2">
+          <div class="card-inner">
+            <div class="card-icon">🚛</div>
+            <span>Transporter</span>
+            <div class="score-mini cyan">84.7</div>
+          </div>
+        </div>
+        <div class="orbit-card oc-3">
+          <div class="card-inner">
+            <div class="card-icon">🏪</div>
+            <span>Retailer</span>
+            <div class="score-mini high">88.9</div>
+          </div>
+        </div>
+        <div class="orbit-card oc-4">
+          <div class="card-inner">
+            <div class="card-icon">📦</div>
+            <span>Distributor</span>
+            <div class="score-mini mid">67.3</div>
+          </div>
+        </div>
+        <div class="orbit-card oc-5">
+          <div class="card-inner">
+            <div class="card-icon">🔗</div>
+            <span>On-Chain</span>
+            <div class="score-mini cyan">✓ Verified</div>
+          </div>
+        </div>
+        <div class="orbit-card oc-6">
+          <div class="card-inner">
+            <div class="card-icon">📊</div>
+            <span>Analytics</span>
+            <div class="score-mini high">Live</div>
+          </div>
+        </div>
+        <div class="orbit-card oc-7">
+          <div class="card-inner">
+            <div class="card-icon">⚖️</div>
+            <span>Disputes</span>
+            <div class="score-mini high">3 Open</div>
+          </div>
+        </div>
+        <div class="orbit-card oc-8">
+          <div class="card-inner">
+            <div class="card-icon">🌐</div>
+            <span>Network</span>
+            <div class="score-mini cyan">412 Nodes</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hero copy -->
+    <div class="hero-content">
+      <div class="hero-eyebrow"><div class="eyebrow-dot"></div> Trust-driven supply chain intelligence</div>
+      <h1 class="hero-title">
+        Where <em>trust</em> becomes<br>
+        the <span class="accent-word">infrastructure</span>
+      </h1>
+      <p class="hero-sub">
+        ChainX turns every delivery, dispute, and delay into a living reputation score — building a supply chain that learns from itself.
+      </p>
+      <div class="hero-actions">
+        <a href="#cta" class="btn-primary">↓ Request Early Access</a>
+        <a href="#showcase" class="btn-ghost">See Platform →</a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat">
+          <div class="stat-num">412<sup>+</sup></div>
+          <div class="stat-label">Stakeholders</div>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <div class="stat-num">97<sup>%</sup></div>
+          <div class="stat-label">On-time rate</div>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <div class="stat-num">84<sup>.2</sup></div>
+          <div class="stat-label">Avg trust score</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TICKER -->
+  <div class="ticker-wrap">
+    <div class="ticker-track">
+      <div class="ticker-item"><span>⬡</span> Real-time trust scoring</div>
+      <div class="ticker-item"><span>⬡</span> On-chain dispute resolution</div>
+      <div class="ticker-item"><span>⬡</span> Reputation that persists</div>
+      <div class="ticker-item"><span>⬡</span> Behavior-driven intelligence</div>
+      <div class="ticker-item"><span>⬡</span> Multi-tier stakeholder network</div>
+      <div class="ticker-item"><span>⬡</span> Transparent audit trail</div>
+      <div class="ticker-item"><span>⬡</span> Predictive risk signals</div>
+      <div class="ticker-item"><span>⬡</span> Self-improving ecosystem</div>
+      <!-- duplicate for seamless loop -->
+      <div class="ticker-item"><span>⬡</span> Real-time trust scoring</div>
+      <div class="ticker-item"><span>⬡</span> On-chain dispute resolution</div>
+      <div class="ticker-item"><span>⬡</span> Reputation that persists</div>
+      <div class="ticker-item"><span>⬡</span> Behavior-driven intelligence</div>
+      <div class="ticker-item"><span>⬡</span> Multi-tier stakeholder network</div>
+      <div class="ticker-item"><span>⬡</span> Transparent audit trail</div>
+      <div class="ticker-item"><span>⬡</span> Predictive risk signals</div>
+      <div class="ticker-item"><span>⬡</span> Self-improving ecosystem</div>
+    </div>
+  </div>
+
+  <!-- FEATURES -->
+  <section id="features">
+    <div class="reveal">
+      <div class="section-label">// What we built</div>
+      <h2 class="section-title">Designed for <em>real</em> supply chains. Built for behavior.</h2>
+      <p class="section-sub">Most platforms track boxes. ChainX tracks behavior — turning every action into intelligence.</p>
+    </div>
+    <div class="features-layout reveal">
+      <div class="feat-cell">
+        <div class="feat-highlight"></div>
+        <div class="feat-num">01</div>
+        <div class="feat-icon-wrap">⬡</div>
+        <div class="feat-name">Living Trust Score</div>
+        <p class="feat-desc">Every delivery, dispute, and interaction compounds into a dynamic reputation score that evolves in real time — no manual ratings, no biased reviews.</p>
+      </div>
+      <div class="feat-cell">
+        <div class="feat-highlight"></div>
+        <div class="feat-num">02</div>
+        <div class="feat-icon-wrap">⚖️</div>
+        <div class="feat-name">On-Chain Disputes</div>
+        <p class="feat-desc">Disputes are recorded, adjudicated, and resolved transparently on-chain. No he-said-she-said — just cryptographically verifiable outcomes.</p>
+      </div>
+      <div class="feat-cell large">
+        <div>
+          <div class="feat-num">03</div>
+          <div class="feat-icon-wrap">📊</div>
+          <div class="feat-name">Network Trust Snapshot</div>
+          <p class="feat-desc">A real-time dashboard of your entire stakeholder network. Surface high-trust partners, spot low-trust actors early, and watch your chain improve over time.</p>
+        </div>
+        <div class="feat-visual">
+          <div class="mini-kpis">
+            <div class="mini-kpi">
+              <div class="mini-kpi-label">Avg Trust</div>
+              <div class="mini-kpi-val c">84.2</div>
+            </div>
+            <div class="mini-kpi">
+              <div class="mini-kpi-label">On-Time</div>
+              <div class="mini-kpi-val g">97.8%</div>
+            </div>
+            <div class="mini-kpi">
+              <div class="mini-kpi-label">Disputes</div>
+              <div class="mini-kpi-val a">3</div>
+            </div>
+          </div>
+          <div class="mini-bars">
+            <div class="mini-bar-row">
+              <div class="mini-bar-label">Nexus Logistics</div>
+              <div class="mini-bar-bg"><div class="mini-bar-fill bf-g" style="width:92%"></div></div>
+            </div>
+            <div class="mini-bar-row">
+              <div class="mini-bar-label">ArcMfg Co.</div>
+              <div class="mini-bar-bg"><div class="mini-bar-fill bf-a" style="width:67%"></div></div>
+            </div>
+            <div class="mini-bar-row">
+              <div class="mini-bar-label">Orion Retail</div>
+              <div class="mini-bar-bg"><div class="mini-bar-fill bf-g" style="width:89%"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="feat-cell">
+        <div class="feat-highlight"></div>
+        <div class="feat-num">04</div>
+        <div class="feat-icon-wrap">🔁</div>
+        <div class="feat-name">Persistent Reputation</div>
+        <p class="feat-desc">Reputation travels with each stakeholder across orders, partners, and platforms. Bad actors can't reset. Good partners get rewarded.</p>
+      </div>
+      <div class="feat-cell">
+        <div class="feat-highlight"></div>
+        <div class="feat-num">05</div>
+        <div class="feat-icon-wrap">🔮</div>
+        <div class="feat-name">Predictive Risk Signals</div>
+        <p class="feat-desc">Behavioral patterns surface before problems escalate. ChainX flags anomalies and trends weeks before they become disputes.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SHOWCASE / DASHBOARD -->
+  <section id="showcase">
+    <div class="showcase-inner reveal">
+      <div class="showcase-header">
+        <div>
+          <div class="section-label">// The platform</div>
+          <h2 class="section-title" style="font-size:clamp(1.6rem,3vw,2.4rem)">Everything you need to<br><em>see</em> your chain clearly.</h2>
+        </div>
+        <a href="#cta" class="btn-ghost" style="white-space:nowrap">Get Early Access →</a>
+      </div>
+      <div class="dashboard-frame">
+        <div class="frame-chrome">
+          <div class="chrome-btn cb-r"></div>
+          <div class="chrome-btn cb-y"></div>
+          <div class="chrome-btn cb-g"></div>
+          <div class="frame-url">app.chainx.io/dashboard</div>
+        </div>
+        <div class="frame-body">
+          <div class="frame-sidebar">
+            <div class="sb-label">Workspace</div>
+            <div class="sb-item active">⬡ &nbsp;Overview</div>
+            <div class="sb-item">⬕ &nbsp;Stakeholders</div>
+            <div class="sb-item">⬖ &nbsp;Disputes</div>
+            <div class="sb-item">◫ &nbsp;Analytics</div>
+            <div class="sb-label">Network</div>
+            <div class="sb-item">◌ &nbsp;Manufacturers</div>
+            <div class="sb-item">◎ &nbsp;Transporters</div>
+            <div class="sb-item">○ &nbsp;Distributors</div>
+            <div class="sb-item">◯ &nbsp;Retailers</div>
+          </div>
+          <div class="frame-main">
+            <div class="frame-topbar">
+              <div class="frame-title">Network Trust Snapshot</div>
+              <div class="live-badge"><div class="live-dot"></div> Live · 14ms refresh</div>
+            </div>
+            <div class="kpi-row">
+              <div class="kpi-box">
+                <div class="kpi-label">Avg Trust Score</div>
+                <div class="kpi-val c">84.2</div>
+                <div class="kpi-delta">↑ 3.1 this month</div>
+              </div>
+              <div class="kpi-box">
+                <div class="kpi-label">On-Time Deliveries</div>
+                <div class="kpi-val g">97.8%</div>
+                <div class="kpi-delta">↑ 1.2% vs last quarter</div>
+              </div>
+              <div class="kpi-box">
+                <div class="kpi-label">Active Disputes</div>
+                <div class="kpi-val a">3</div>
+                <div class="kpi-delta" style="color:var(--amber)">↓ 5 resolved today</div>
+              </div>
+            </div>
+            <div class="stakes-grid">
+              <div class="stake">
+                <div class="stake-head">
+                  <div>
+                    <div class="stake-name">Nexus Logistics</div>
+                    <div class="stake-role">Transporter · Tier 1</div>
+                  </div>
+                  <div class="trust-pill tp-g">92.4</div>
+                </div>
+                <div class="bar-bg"><div class="bar-fill bf-g" style="width:92%"></div></div>
+              </div>
+              <div class="stake">
+                <div class="stake-head">
+                  <div>
+                    <div class="stake-name">ArcMfg Co.</div>
+                    <div class="stake-role">Manufacturer · Tier 1</div>
+                  </div>
+                  <div class="trust-pill tp-a">67.1</div>
+                </div>
+                <div class="bar-bg"><div class="bar-fill bf-a" style="width:67%"></div></div>
+              </div>
+              <div class="stake">
+                <div class="stake-head">
+                  <div>
+                    <div class="stake-name">Orion Retail</div>
+                    <div class="stake-role">Retailer · Tier 2</div>
+                  </div>
+                  <div class="trust-pill tp-g">88.9</div>
+                </div>
+                <div class="bar-bg"><div class="bar-fill bf-g" style="width:89%"></div></div>
+              </div>
+            </div>
+            <div class="graph-box">
+              <div class="graph-head">
+                <div class="graph-name">Trust Score Trend — Last 30 Days</div>
+                <div class="graph-legend">
+                  <div class="gl-item"><div class="gl-dot" style="background:#2ecc71"></div>Nexus</div>
+                  <div class="gl-item"><div class="gl-dot" style="background:var(--amber)"></div>ArcMfg</div>
+                  <div class="gl-item"><div class="gl-dot" style="background:var(--cyan)"></div>Orion</div>
+                </div>
+              </div>
+              <svg class="svg-graph" viewBox="0 0 600 80" preserveAspectRatio="none">
+                <defs>
+                  <linearGradient id="gN" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#2ecc71" stop-opacity=".25"/>
+                    <stop offset="100%" stop-color="#2ecc71" stop-opacity="0"/>
+                  </linearGradient>
+                  <linearGradient id="gA" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#f5a623" stop-opacity=".25"/>
+                    <stop offset="100%" stop-color="#f5a623" stop-opacity="0"/>
+                  </linearGradient>
+                  <linearGradient id="gO" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#00dcc8" stop-opacity=".25"/>
+                    <stop offset="100%" stop-color="#00dcc8" stop-opacity="0"/>
+                  </linearGradient>
+                </defs>
+                <line x1="0" y1="20" x2="600" y2="20" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+                <line x1="0" y1="40" x2="600" y2="40" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+                <line x1="0" y1="60" x2="600" y2="60" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+                <path d="M0,28 C80,26 160,10 240,8 S400,6 480,4 L600,2" fill="none" stroke="#2ecc71" stroke-width="1.5"/>
+                <path d="M0,28 C80,26 160,10 240,8 S400,6 480,4 L600,2 L600,80 L0,80 Z" fill="url(#gN)"/>
+                <path d="M0,50 C80,55 160,47 240,53 S360,57 480,49 L600,43" fill="none" stroke="#f5a623" stroke-width="1.5"/>
+                <path d="M0,50 C80,55 160,47 240,53 S360,57 480,49 L600,43 L600,80 L0,80 Z" fill="url(#gA)"/>
+                <path d="M0,36 C80,32 160,17 240,19 S400,15 480,11 L600,9" fill="none" stroke="#00dcc8" stroke-width="1.5"/>
+                <path d="M0,36 C80,32 160,17 240,19 S400,15 480,11 L600,9 L600,80 L0,80 Z" fill="url(#gO)"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHY -->
+  <section id="why">
+    <div class="reveal">
+      <div class="section-label">// The difference</div>
+      <h2 class="section-title">A supply chain that<br><em>learns from itself</em></h2>
+    </div>
+    <div class="why-layout reveal">
+      <div class="why-panel dark">
+        <div class="why-tag">Traditional Systems</div>
+        <div class="why-title">Products move. Data sits still.</div>
+        <ul class="why-list">
+          <li>Status updates are snapshots, not stories</li>
+          <li>Reputation lives in spreadsheets, not systems</li>
+          <li>Bad actors can start fresh with each order</li>
+          <li>Disputes are settled outside the platform</li>
+        </ul>
+      </div>
+      <div class="why-panel lit">
+        <div class="why-tag">ChainX Approach</div>
+        <div class="why-title">Behavior is the data.</div>
+        <ul class="why-list">
+          <li>Every action compounds into a living trust score</li>
+          <li>Reputation persists and travels with each stakeholder</li>
+          <li>Patterns surface before problems escalate</li>
+          <li>Disputes are resolved transparently, on-chain</li>
+        </ul>
+      </div>
+      <div class="why-full">
+        <div class="why-full-icon">⬡</div>
+        <div>
+          <div class="why-tag">The result</div>
+          <div class="why-title">A self-improving supply chain ecosystem</div>
+          <p>As more stakeholders participate, the trust graph deepens. High-reputation partners surface naturally, low-trust actors face friction, and the entire network becomes more reliable over time — without central enforcement.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section id="testimonials">
+    <div class="testi-header reveal">
+      <div class="section-label" style="text-align:center">// What builders say</div>
+      <h2 class="section-title" style="text-align:center;margin:0 auto;max-width:600px">Trusted by teams<br><em>who move things</em></h2>
+    </div>
+    <div class="testi-scroll-outer">
+      <div class="testi-track">
+        <div class="testi-card">
+          <div class="testi-quote">"Found our most reliable logistics partner through ChainX's trust rankings. We cut vetting time by 80%."</div>
+          <div class="testi-author">
+            <div class="testi-avatar">AR</div>
+            <div>
+              <div class="testi-name">Arjun R.</div>
+              <div class="testi-role">Head of Supply · NexaCo</div>
+            </div>
+          </div>
+        </div>
+        <div class="testi-card">
+          <div class="testi-quote">"ChainX caught a pattern with one of our transporters two weeks before a major delay. The predictive signals are uncanny."</div>
+          <div class="testi-author">
+            <div class="testi-avatar">SM</div>
+            <div>
+              <div class="testi-name">Sofia M.</div>
+              <div class="testi-role">Logistics Director · Arcline</div>
+            </div>
+          </div>
+        </div>
+        <div class="testi-card">
+          <div class="testi-quote">"On-chain dispute resolution actually works. We settled three supplier conflicts in 48 hours. Previously took months."</div>
+          <div class="testi-author">
+            <div class="testi-avatar">JO</div>
+            <div>
+              <div class="testi-name">James O.</div>
+              <div class="testi-role">COO · TradeLink Africa</div>
+            </div>
+          </div>
+        </div>
+        <div class="testi-card">
+          <div class="testi-quote">"The trust graph is genuinely the best tool we've used to evaluate new manufacturing partners. Data-driven, not gut-driven."</div>
+          <div class="testi-author">
+            <div class="testi-avatar">PN</div>
+            <div>
+              <div class="testi-name">Priya N.</div>
+              <div class="testi-role">Procurement Lead · Fabricate</div>
+            </div>
+          </div>
+        </div>
+        <div class="testi-card">
+          <div class="testi-quote">"Six months on ChainX. Our network trust average went from 71 to 84. The self-improving loop is real."</div>
+          <div class="testi-author">
+            <div class="testi-avatar">LF</div>
+            <div>
+              <div class="testi-name">Lena F.</div>
+              <div class="testi-role">VP Operations · Vorwerk EU</div>
+            </div>
+          </div>
+        </div>
+        <div class="testi-card">
+          <div class="testi-quote">"We integrated ChainX in a day. By week two, we had already replaced two underperforming distributors using trust data."</div>
+          <div class="testi-author">
+            <div class="testi-avatar">TN</div>
+            <div>
+              <div class="testi-name">Tyler N.</div>
+              <div class="testi-role">CTO · Dispatch Labs</div>
+            </div>
+          </div>
+        </div>
+        <!-- duplicates for seamless scroll -->
+        <div class="testi-card">
+          <div class="testi-quote">"Found our most reliable logistics partner through ChainX's trust rankings. We cut vetting time by 80%."</div>
+          <div class="testi-author">
+            <div class="testi-avatar">AR</div>
+            <div>
+              <div class="testi-name">Arjun R.</div>
+              <div class="testi-role">Head of Supply · NexaCo</div>
+            </div>
+          </div>
+        </div>
+        <div class="testi-card">
+          <div class="testi-quote">"ChainX caught a pattern with one of our transporters two weeks before a major delay. The predictive signals are uncanny."</div>
+          <div class="testi-author">
+            <div class="testi-avatar">SM</div>
+            <div>
+              <div class="testi-name">Sofia M.</div>
+              <div class="testi-role">Logistics Director · Arcline</div>
+            </div>
+          </div>
+        </div>
+        <div class="testi-card">
+          <div class="testi-quote">"On-chain dispute resolution actually works. We settled three supplier conflicts in 48 hours. Previously took months."</div>
+          <div class="testi-author">
+            <div class="testi-avatar">JO</div>
+            <div>
+              <div class="testi-name">James O.</div>
+              <div class="testi-role">COO · TradeLink Africa</div>
+            </div>
+          </div>
+        </div>
+        <div class="testi-card">
+          <div class="testi-quote">"The trust graph is genuinely the best tool we've used to evaluate new manufacturing partners. Data-driven, not gut-driven."</div>
+          <div class="testi-author">
+            <div class="testi-avatar">PN</div>
+            <div>
+              <div class="testi-name">Priya N.</div>
+              <div class="testi-role">Procurement Lead · Fabricate</div>
+            </div>
+          </div>
+        </div>
+        <div class="testi-card">
+          <div class="testi-quote">"Six months on ChainX. Our network trust average went from 71 to 84. The self-improving loop is real."</div>
+          <div class="testi-author">
+            <div class="testi-avatar">LF</div>
+            <div>
+              <div class="testi-name">Lena F.</div>
+              <div class="testi-role">VP Operations · Vorwerk EU</div>
+            </div>
+          </div>
+        </div>
+        <div class="testi-card">
+          <div class="testi-quote">"We integrated ChainX in a day. By week two, we had already replaced two underperforming distributors using trust data."</div>
+          <div class="testi-author">
+            <div class="testi-avatar">TN</div>
+            <div>
+              <div class="testi-name">Tyler N.</div>
+              <div class="testi-role">CTO · Dispatch Labs</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section id="cta">
+    <div class="cta-title">Don't just track.<br><em>Understand.</em></div>
+    <p class="cta-sub">Join the growing network of supply chain teams building on trust as infrastructure.</p>
+    <div class="cta-btns">
+      <a href="#" class="btn-primary">↓ Request Early Access</a>
+      <a href="#features" class="btn-ghost">Learn More →</a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-inner">
+      <div>
+        <div class="footer-logo">
+          <div class="nav-logo-mark">CX</div>
+          ChainX
+        </div>
+        <div class="footer-tagline">Reputation-driven supply chain intelligence.</div>
+      </div>
+      <div class="footer-links">
+        <a href="#">Documentation</a>
+        <a href="#">GitHub</a>
+        <a href="#">Team</a>
+        <a href="#">Contact</a>
+      </div>
+      <div class="footer-badge">⬡ HACKATHON BUILD 2025</div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 ChainX. Built for innovation.</span>
+      <span>v0.1.0-alpha</span>
+    </div>
+  </footer>
+
+  <script>
+    // Scroll reveal
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold: 0.08 });
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    // CSS trig fallback for older browsers
+    // Position orbit cards via JS for better compatibility
+    const cards = document.querySelectorAll('.orbit-card');
+    const R = window.innerWidth < 900 ? 250 : 350;
+    cards.forEach((card, i) => {
+      const angle = (i / cards.length) * 2 * Math.PI - Math.PI / 2;
+      const x = Math.cos(angle) * R;
+      const y = Math.sin(angle) * R;
+      const size = window.innerWidth < 900 ? 85 : 110;
+      card.style.left = `calc(50% + ${x}px - ${size/2}px)`;
+      card.style.top  = `calc(50% + ${y}px - ${size/2}px)`;
+    });
+  </script>
+</body>
+</html>
