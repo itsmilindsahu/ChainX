@@ -1,0 +1,1309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Axiom Labs — Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700;1,900&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black:     #050505;
+      --off:       #0c0c0c;
+      --card-bg:   #111111;
+      --surface:   rgba(255,255,255,0.025);
+      --border:    rgba(255,255,255,0.07);
+      --border-hi: rgba(255,255,255,0.15);
+      --white:     #f4f0e8;
+      --muted:     #666;
+      --muted2:    #888;
+      --accent:    #c8f75a;
+      --accent-d:  rgba(200,247,90,0.1);
+      --green:     #5af77a;
+      --amber:     #f7be5a;
+      --red:       #f7675a;
+      --sidebar-w: 220px;
+    }
+
+    html, body { height: 100%; overflow: hidden; }
+    body {
+      background: var(--black);
+      color: var(--white);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 400;
+      line-height: 1.6;
+      display: flex;
+    }
+
+    /* ── SIDEBAR ── */
+    #sidebar {
+      width: var(--sidebar-w); flex-shrink: 0;
+      height: 100vh; background: var(--off);
+      border-right: 1px solid var(--border);
+      display: flex; flex-direction: column;
+      position: relative; z-index: 10;
+      overflow-y: auto;
+    }
+    .sb-logo {
+      padding: 24px 20px 20px;
+      border-bottom: 1px solid var(--border);
+      font-family: 'Playfair Display', serif;
+      font-size: 1.25rem; font-weight: 900;
+      color: var(--white); letter-spacing: -0.01em;
+      cursor: pointer; user-select: none;
+    }
+    .sb-logo em { font-style: italic; color: var(--accent); }
+    .sb-logo small {
+      display: block;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.58rem; color: var(--muted);
+      font-weight: 400; letter-spacing: 0.1em;
+      text-transform: uppercase; margin-top: 3px;
+    }
+    .sb-nav { padding: 16px 10px; flex: 1; }
+    .sb-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.58rem; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--muted);
+      padding: 0 10px; margin: 16px 0 6px;
+    }
+    .sb-label:first-child { margin-top: 0; }
+    .sb-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 12px; border-radius: 10px;
+      font-size: 0.83rem; color: var(--muted2);
+      cursor: pointer; margin-bottom: 2px;
+      transition: background .15s, color .15s;
+      user-select: none;
+    }
+    .sb-item:hover:not(.active) { background: rgba(255,255,255,0.04); color: var(--white); }
+    .sb-item.active { background: var(--accent-d); color: var(--accent); }
+    .sb-icon { font-size: 0.95rem; width: 18px; text-align: center; flex-shrink: 0; }
+    .sb-foot {
+      padding: 16px 20px;
+      border-top: 1px solid var(--border);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.58rem; color: var(--muted);
+      letter-spacing: 0.04em; line-height: 1.9;
+    }
+    .sb-foot a { color: var(--muted); text-decoration: none; transition: color .2s; }
+    .sb-foot a:hover { color: var(--accent); }
+
+    /* ── MAIN ── */
+    #main { flex: 1; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+
+    /* ── TOPBAR ── */
+    #topbar {
+      height: 62px; flex-shrink: 0; padding: 0 28px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      background: rgba(5,5,5,0.9); backdrop-filter: blur(20px);
+    }
+    .tb-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.05rem; font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    .tb-right { display: flex; align-items: center; gap: 14px; }
+    .live-pill {
+      display: flex; align-items: center; gap: 6px;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.62rem; color: var(--accent); letter-spacing: 0.05em;
+    }
+    .live-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--accent); animation: pulse 2s infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(1.4)} }
+
+    .tb-btn {
+      padding: 8px 18px;
+      background: var(--white);
+      border: none; border-radius: 999px;
+      color: var(--black);
+      font-size: 0.78rem; font-weight: 600;
+      cursor: pointer; transition: background .2s;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .tb-btn:hover { background: var(--accent); }
+
+    /* ── VIEWS ── */
+    .view {
+      flex: 1; overflow-y: auto; overflow-x: hidden;
+      padding: 24px 28px;
+    }
+    .view.hidden { display: none !important; }
+    #view-graph { padding: 0; overflow: hidden; display: flex; flex-direction: column; }
+    #view-graph.hidden { display: none !important; }
+
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 999px; }
+
+    /* ── KPI ROW ── */
+    .kpi-row {
+      display: grid; grid-template-columns: repeat(4,1fr);
+      gap: 12px; margin-bottom: 20px;
+    }
+    .kpi-card {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 16px; padding: 20px;
+      position: relative; overflow: hidden;
+      transition: border-color .2s;
+    }
+    .kpi-card:hover { border-color: var(--border-hi); }
+    .kpi-card::after {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(200,247,90,0.3), transparent);
+    }
+    .kpi-lbl { font-size: 0.68rem; color: var(--muted2); letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 10px; }
+    .kpi-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.2rem; font-weight: 900;
+      line-height: 1; letter-spacing: -0.03em;
+    }
+    .kpi-num.c-accent { color: var(--accent); }
+    .kpi-num.c-green  { color: var(--green); }
+    .kpi-num.c-amber  { color: var(--amber); }
+    .kpi-num.c-red    { color: var(--red); }
+    .kpi-num.c-white  { color: var(--white); }
+    .kpi-sub { font-size: 0.68rem; color: var(--muted); margin-top: 5px; }
+    .kpi-ico { position: absolute; top: 18px; right: 18px; font-size: 1.3rem; opacity: 0.1; }
+
+    /* ── DASH GRID ── */
+    .dash-grid { display: grid; grid-template-columns: 1fr 290px; gap: 16px; margin-bottom: 20px; }
+    .dash-left { display: flex; flex-direction: column; gap: 16px; }
+    .dash-right { display: flex; flex-direction: column; gap: 12px; }
+
+    /* ── CARD ── */
+    .s-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
+    .s-head {
+      padding: 14px 18px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .s-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.92rem; font-weight: 700;
+    }
+    .s-tag { font-family: 'DM Mono', monospace; font-size: 0.6rem; color: var(--muted2); }
+    .s-body { padding: 16px 18px; }
+
+    /* ── STAKEHOLDER CARDS ── */
+    .stk-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(195px,1fr)); gap: 10px; }
+    .stk-card {
+      background: rgba(255,255,255,0.02); border: 1px solid var(--border);
+      border-radius: 12px; padding: 14px;
+      cursor: pointer; transition: transform .18s, border-color .18s;
+    }
+    .stk-card:hover { transform: translateY(-2px); border-color: var(--border-hi); }
+    .stk-card.trusted  { border-color: rgba(90,247,122,0.22); }
+    .stk-card.rising   { border-color: rgba(200,247,90,0.18); }
+    .stk-card.watchlist{ border-color: rgba(247,190,90,0.22); }
+    .stk-card.critical { border-color: rgba(247,103,90,0.28); }
+
+    .stk-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+    .stk-name { font-weight: 600; font-size: 0.85rem; }
+    .stk-meta { font-size: 0.66rem; color: var(--muted2); margin-top: 2px; }
+    .rep-badge {
+      font-family: 'DM Mono', monospace; font-size: 0.62rem;
+      font-weight: 600; padding: 2px 8px; border-radius: 5px; white-space: nowrap;
+    }
+    .rep-badge.trusted  { background:rgba(90,247,122,0.08); color:#5af77a; border:1px solid rgba(90,247,122,0.22); }
+    .rep-badge.rising   { background:rgba(200,247,90,0.08); color:var(--accent); border:1px solid rgba(200,247,90,0.22); }
+    .rep-badge.watchlist{ background:rgba(247,190,90,0.08); color:var(--amber); border:1px solid rgba(247,190,90,0.22); }
+    .rep-badge.critical { background:rgba(247,103,90,0.08); color:var(--red); border:1px solid rgba(247,103,90,0.22); }
+
+    .score-row { display: flex; align-items: baseline; gap: 4px; margin-bottom: 6px; }
+    .score-big {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.6rem; font-weight: 900; letter-spacing: -0.03em;
+    }
+    .score-of  { font-size: 0.62rem; color: var(--muted); }
+    .bar-bg { height: 2px; background: rgba(255,255,255,0.06); border-radius: 999px; }
+    .bar-fill { height: 2px; border-radius: 999px; transition: width .5s ease; }
+    .bf-trusted  { background: linear-gradient(90deg,#5af77a,#1abc9c); }
+    .bf-rising   { background: linear-gradient(90deg,#c8f75a,#5af77a); }
+    .bf-watchlist{ background: linear-gradient(90deg,#f7be5a,#e67e22); }
+    .bf-critical { background: linear-gradient(90deg,#f7675a,#c0392b); }
+
+    .stk-stats { display: flex; gap: 10px; margin-top: 10px; }
+    .stk-stat { flex: 1; text-align: center; }
+    .stk-sv { font-family: 'DM Mono', monospace; font-size: 0.76rem; font-weight: 500; }
+    .stk-sl { font-size: 0.56rem; color: var(--muted); margin-top: 1px; letter-spacing: 0.03em; text-transform: uppercase; }
+
+    /* ── SHIPMENT TABLE ── */
+    .ship-tbl { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+    .ship-tbl th {
+      font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.08em;
+      color: var(--muted); font-weight: 500;
+      padding: 8px 14px; text-align: left; border-bottom: 1px solid var(--border);
+    }
+    .ship-tbl td { padding: 9px 14px; border-bottom: 1px solid rgba(255,255,255,0.03); }
+    .ship-tbl tr:last-child td { border-bottom: none; }
+    .ship-tbl tr:hover td { background: rgba(255,255,255,0.015); }
+    .ship-id { font-family: 'DM Mono', monospace; font-size: 0.68rem; color: var(--muted); }
+    .s-pill {
+      display: inline-block; padding: 2px 7px;
+      border-radius: 999px; font-size: 0.65rem; font-weight: 600;
+    }
+    .sp-on    { background: rgba(90,247,122,0.08); color:#5af77a; }
+    .sp-del   { background: rgba(247,190,90,0.08); color:var(--amber); }
+    .sp-maj   { background: rgba(247,103,90,0.08); color:var(--red); }
+    .sp-dis   { background: rgba(247,103,90,0.12); color:var(--red); border:1px solid rgba(247,103,90,0.25); }
+    .stars    { color: var(--amber); font-size: 0.75rem; letter-spacing: -1px; }
+    .ts-dim   { font-size: 0.66rem; color: var(--muted); }
+
+    /* ── SIDE PANELS ── */
+    .panel-list { list-style: none; }
+    .panel-item {
+      display: flex; align-items: center;
+      padding: 9px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .panel-item:last-child { border-bottom: none; }
+    .p-rank { font-family: 'DM Mono', monospace; font-size: 0.65rem; color: var(--muted); width: 20px; flex-shrink: 0; }
+    .p-name { font-size: 0.82rem; font-weight: 500; flex: 1; margin-left: 8px; line-height: 1.3; }
+    .p-name small { font-size: 0.58rem; color: var(--muted); display: block; font-weight: 400; }
+    .p-score { font-family: 'DM Mono', monospace; font-size: 0.78rem; font-weight: 600; }
+
+    .rec-card {
+      background: rgba(255,255,255,0.02); border: 1px solid var(--border);
+      border-radius: 10px; padding: 11px 13px; margin-bottom: 8px;
+    }
+    .rec-card:last-child { margin-bottom: 0; }
+    .rec-lbl { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin-bottom: 3px; }
+    .rec-val { font-size: 0.86rem; font-weight: 600; }
+    .rec-sub { font-size: 0.66rem; color: var(--muted); margin-top: 2px; }
+
+    /* ── GRAPH ── */
+    .g-header {
+      padding: 14px 28px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 14px; flex-shrink: 0;
+    }
+    .g-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem; font-weight: 700;
+    }
+    .g-legend { display: flex; gap: 14px; margin-left: auto; }
+    .leg-item { display: flex; align-items: center; gap: 5px; font-size: 0.68rem; color: var(--muted2); }
+    .leg-dot { width: 7px; height: 7px; border-radius: 50%; }
+    .g-canvas-wrap { flex: 1; position: relative; overflow: hidden; }
+    #trust-canvas { width: 100%; height: 100%; display: block; }
+    .g-hint {
+      position: absolute; bottom: 18px; left: 50%; transform: translateX(-50%);
+      font-family: 'DM Mono', monospace; font-size: 0.6rem;
+      color: var(--muted2); letter-spacing: 0.06em; pointer-events: none;
+      background: rgba(5,5,5,0.8); padding: 5px 14px; border-radius: 999px;
+      border: 1px solid var(--border); backdrop-filter: blur(10px);
+    }
+
+    /* ── NODE DRAWER ── */
+    #node-drawer {
+      position: fixed; right: 0; top: 0;
+      width: 300px; height: 100vh;
+      background: rgba(5,5,5,0.98);
+      border-left: 1px solid var(--border);
+      z-index: 200; padding: 26px 22px;
+      transform: translateX(100%); transition: transform .28s ease;
+      backdrop-filter: blur(24px); overflow-y: auto;
+    }
+    #node-drawer.open { transform: translateX(0); }
+    .drawer-close {
+      position: absolute; top: 18px; right: 18px;
+      background: none; border: none;
+      color: var(--muted); font-size: 1.1rem; cursor: pointer; transition: color .2s;
+    }
+    .drawer-close:hover { color: var(--white); }
+    .d-section { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--border); }
+    .d-sec-title { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 8px; font-family: 'DM Mono', monospace; }
+    .d-row { display: flex; justify-content: space-between; margin-bottom: 7px; }
+    .d-lbl { font-size: 0.78rem; color: var(--muted2); }
+    .d-val { font-size: 0.78rem; font-weight: 600; }
+
+    /* ── SIMULATE VIEW ── */
+    .sim-layout { display: grid; grid-template-columns: 1fr 340px; gap: 20px; }
+
+    .fs-title {
+      font-family: 'DM Mono', monospace; font-size: 0.6rem;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 14px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .fs-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .form-grp { margin-bottom: 14px; }
+    .form-lbl { font-size: 0.7rem; color: var(--muted2); margin-bottom: 5px; display: block; }
+    .form-ctrl {
+      width: 100%; background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border); border-radius: 10px;
+      padding: 9px 13px; color: var(--white);
+      font-family: 'DM Sans', sans-serif; font-size: 0.85rem;
+      outline: none; transition: border-color .2s; appearance: none;
+    }
+    .form-ctrl:focus { border-color: rgba(200,247,90,0.4); box-shadow: 0 0 0 3px rgba(200,247,90,0.07); }
+    select.form-ctrl option { background: #111; }
+
+    .tog-group { display: flex; gap: 7px; flex-wrap: wrap; }
+    .tog-btn {
+      padding: 7px 13px; border-radius: 8px;
+      border: 1px solid var(--border); background: rgba(255,255,255,0.03);
+      color: var(--muted2); font-size: 0.76rem; cursor: pointer;
+      transition: all .14s; font-family: 'DM Sans', sans-serif;
+    }
+    .tog-btn:hover:not(.active) { border-color: rgba(255,255,255,0.14); color: var(--white); }
+    .tog-btn.active { border-color: var(--accent); background: rgba(200,247,90,0.08); color: var(--accent); }
+
+    .star-row { display: flex; gap: 4px; }
+    .star-btn {
+      font-size: 1.4rem; cursor: pointer;
+      opacity: 0.2; transition: opacity .14s, transform .14s;
+      background: none; border: none; padding: 2px; color: var(--amber);
+    }
+    .star-btn.lit { opacity: 1; }
+    .star-btn:hover { transform: scale(1.2); }
+
+    .flags-row { display: flex; gap: 7px; flex-wrap: wrap; }
+    .flag-btn {
+      padding: 5px 11px; border-radius: 6px;
+      border: 1px solid var(--border); background: rgba(255,255,255,0.03);
+      color: var(--muted2); font-size: 0.7rem; cursor: pointer;
+      transition: all .14s; font-family: 'DM Sans', sans-serif;
+    }
+    .flag-btn.active { border-color: rgba(247,190,90,0.4); background: rgba(247,190,90,0.07); color: var(--amber); }
+
+    .form-ta { resize: vertical; min-height: 68px; }
+
+    .sim-btns { display: flex; gap: 10px; margin-top: 22px; }
+    .btn-simulate {
+      flex: 1; padding: 12px 22px;
+      background: var(--white); color: var(--black);
+      font-weight: 700; font-size: 0.9rem;
+      border-radius: 999px; border: none; cursor: pointer;
+      transition: background .2s, transform .15s;
+    }
+    .btn-simulate:hover { background: var(--accent); transform: translateY(-2px); }
+    .btn-reset-sim {
+      padding: 12px 18px; background: transparent;
+      border: 1px solid var(--border); border-radius: 999px;
+      color: var(--muted2); font-size: 0.85rem; cursor: pointer;
+      transition: border-color .2s, color .2s; font-family: 'DM Sans', sans-serif;
+    }
+    .btn-reset-sim:hover { border-color: var(--border-hi); color: var(--white); }
+
+    /* ── RESULT PANEL ── */
+    .result-panel {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 16px; padding: 22px;
+      position: sticky; top: 0; max-height: calc(100vh - 120px); overflow-y: auto;
+    }
+    .res-waiting { text-align: center; padding: 50px 20px 40px; color: var(--muted); }
+    .res-wait-ico {
+      font-family: 'Playfair Display', serif;
+      font-size: 3rem; font-weight: 900; opacity: 0.1; display: block; margin-bottom: 14px;
+    }
+    .res-wait-txt { font-size: 0.83rem; line-height: 1.7; }
+
+    #res-content { display: none; }
+    #res-content.show { display: block; }
+
+    .res-hdr { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
+    .res-ico { font-size: 1.4rem; }
+    .res-hdr-title { font-family: 'Playfair Display', serif; font-size: 0.95rem; font-weight: 700; }
+    .res-hdr-sub { font-size: 0.68rem; color: var(--muted); }
+
+    .sc-card {
+      background: rgba(255,255,255,0.025); border: 1px solid var(--border);
+      border-radius: 10px; padding: 14px; margin-bottom: 10px;
+    }
+    .sc-name { font-weight: 600; font-size: 0.84rem; }
+    .sc-role-txt { font-size: 0.64rem; color: var(--muted); }
+    .sc-scores { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
+    .sc-old { font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 700; color: var(--muted); }
+    .sc-arr { color: var(--muted); }
+    .sc-new { font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 900; }
+    .sc-new.gain { color: var(--green); }
+    .sc-new.loss { color: var(--red); }
+    .sc-new.same { color: var(--muted); }
+    .sc-delta {
+      font-family: 'DM Mono', monospace; font-size: 0.73rem;
+      font-weight: 600; padding: 2px 8px; border-radius: 5px; margin-left: auto;
+    }
+    .sc-delta.gain { background: rgba(90,247,122,0.1); color: #5af77a; }
+    .sc-delta.loss { background: rgba(247,103,90,0.1); color: var(--red); }
+    .sc-delta.same { background: rgba(255,255,255,0.06); color: var(--muted); }
+
+    .badge-change { font-size: 0.68rem; color: var(--muted); margin-top: 6px; }
+
+    .impact-bar {
+      margin: 14px 0; padding: 10px 14px;
+      border-radius: 10px; text-align: center;
+      font-weight: 600; font-size: 0.83rem;
+    }
+    .ib-pos { background: rgba(90,247,122,0.06); border: 1px solid rgba(90,247,122,0.2); color: var(--green); }
+    .ib-neu { background: rgba(255,255,255,0.04); border: 1px solid var(--border); color: var(--muted2); }
+    .ib-neg { background: rgba(247,103,90,0.06); border: 1px solid rgba(247,103,90,0.2); color: var(--red); }
+
+    .res-msg {
+      font-size: 0.78rem; color: var(--muted2); line-height: 1.7;
+      padding-top: 12px; border-top: 1px solid var(--border);
+    }
+    .res-alert { font-size: 0.74rem; margin-top: 6px; padding: 6px 10px; border-radius: 7px; }
+    .ra-danger { background: rgba(247,103,90,0.07); color: var(--red); border: 1px solid rgba(247,103,90,0.2); }
+    .ra-success { background: rgba(90,247,122,0.07); color: var(--green); border: 1px solid rgba(90,247,122,0.2); }
+
+    /* ── TOAST ── */
+    #toast {
+      position: fixed; bottom: 22px; right: 22px;
+      background: var(--off); border: 1px solid var(--border-hi);
+      border-radius: 12px; padding: 11px 18px;
+      display: flex; align-items: center; gap: 10px;
+      font-size: 0.84rem; z-index: 1000; max-width: 300px;
+      transform: translateY(20px); opacity: 0;
+      transition: transform .28s, opacity .28s;
+      backdrop-filter: blur(20px);
+    }
+    #toast.show { transform: translateY(0); opacity: 1; }
+    .t-ico { font-size: 1rem; flex-shrink: 0; }
+
+    /* ── SCORE FLASH ── */
+    @keyframes flashG { 0%{background:rgba(90,247,122,0.2)} 100%{background:transparent} }
+    @keyframes flashR { 0%{background:rgba(247,103,90,0.2)} 100%{background:transparent} }
+    .flash-g { animation: flashG .6s ease forwards; }
+    .flash-r { animation: flashR .6s ease forwards; }
+
+    @media (max-width: 1000px) {
+      :root { --sidebar-w: 56px; }
+      .sb-logo small, .sb-item span, .sb-foot .ft-lbl, .sb-label { display: none; }
+      .sb-item { justify-content: center; padding: 10px; }
+      .kpi-row { grid-template-columns: 1fr 1fr; }
+      .dash-grid { grid-template-columns: 1fr; }
+      .sim-layout { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 600px) {
+      .kpi-row { grid-template-columns: 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside id="sidebar">
+  <div class="sb-logo" onclick="navigate('dashboard')">
+    Axiom <em>Labs</em>
+    <small>// trust network</small>
+  </div>
+  <nav class="sb-nav">
+    <div class="sb-label">Main</div>
+    <div class="sb-item active" data-view="dashboard" onclick="navigate('dashboard')">
+      <span class="sb-icon">◉</span><span>Dashboard</span>
+    </div>
+    <div class="sb-item" data-view="graph" onclick="navigate('graph')">
+      <span class="sb-icon">◈</span><span>Trust Graph</span>
+    </div>
+    <div class="sb-item" data-view="simulate" onclick="navigate('simulate')">
+      <span class="sb-icon">⬕</span><span>Simulate</span>
+    </div>
+    <div class="sb-label">Network</div>
+    <div class="sb-item" onclick="navigate('dashboard')">
+      <span class="sb-icon">⬡</span><span>Stakeholders</span>
+    </div>
+    <div class="sb-item" onclick="navigate('dashboard')">
+      <span class="sb-icon">◫</span><span>Analytics</span>
+    </div>
+    <div class="sb-item" onclick="navigate('dashboard')">
+      <span class="sb-icon">◌</span><span>Disputes</span>
+    </div>
+  </nav>
+  <div class="sb-foot">
+    <a href="index.html">← Back to Landing</a><br>
+    <span class="ft-lbl">v1.0.0 · Axiom Labs</span>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main id="main">
+
+  <!-- TOPBAR -->
+  <header id="topbar">
+    <div class="tb-title" id="page-title">Dashboard</div>
+    <div class="tb-right">
+      <div class="live-pill"><span class="live-dot"></span><span>Live</span></div>
+      <button class="tb-btn" onclick="navigate('simulate')">+ Simulate Shipment</button>
+    </div>
+  </header>
+
+  <!-- ── DASHBOARD ── -->
+  <div id="view-dashboard" class="view">
+    <div class="kpi-row" id="kpi-row"></div>
+    <div class="dash-grid">
+      <div class="dash-left">
+        <div class="s-card">
+          <div class="s-head">
+            <span class="s-title">Stakeholders</span>
+            <span class="s-tag" id="stk-tag">8 active</span>
+          </div>
+          <div class="s-body">
+            <div class="stk-grid" id="stk-grid"></div>
+          </div>
+        </div>
+        <div class="s-card">
+          <div class="s-head">
+            <span class="s-title">Recent Shipments</span>
+            <span class="s-tag" id="ship-tag">0 logged</span>
+          </div>
+          <div class="s-body" style="padding:0">
+            <table class="ship-tbl">
+              <thead>
+                <tr><th>ID</th><th>From</th><th>To</th><th>Status</th><th>Delay</th><th>Rating</th><th>When</th></tr>
+              </thead>
+              <tbody id="ship-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="dash-right">
+        <div class="s-card">
+          <div class="s-head"><span class="s-title">🏆 Top Trusted</span></div>
+          <div class="s-body"><ul class="panel-list" id="top-list"></ul></div>
+        </div>
+        <div class="s-card">
+          <div class="s-head"><span class="s-title">⚠️ Watchlist</span></div>
+          <div class="s-body"><ul class="panel-list" id="watch-list"></ul></div>
+        </div>
+        <div class="s-card">
+          <div class="s-head"><span class="s-title">💡 Recommendations</span></div>
+          <div class="s-body" id="rec-panel"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── GRAPH ── -->
+  <div id="view-graph" class="view hidden">
+    <div class="g-header">
+      <div class="g-title">Trust Network Graph</div>
+      <div class="g-legend">
+        <div class="leg-item"><div class="leg-dot" style="background:#5af77a"></div>Trusted 85+</div>
+        <div class="leg-item"><div class="leg-dot" style="background:#c8f75a"></div>Rising 65–84</div>
+        <div class="leg-item"><div class="leg-dot" style="background:#f7be5a"></div>Watchlist 40–64</div>
+        <div class="leg-item"><div class="leg-dot" style="background:#f7675a"></div>Critical &lt;40</div>
+      </div>
+    </div>
+    <div class="g-canvas-wrap">
+      <canvas id="trust-canvas"></canvas>
+      <div class="g-hint">Click any node to view stakeholder details</div>
+    </div>
+  </div>
+
+  <!-- ── SIMULATE ── -->
+  <div id="view-simulate" class="view hidden">
+    <div class="sim-layout">
+
+      <!-- FORM -->
+      <div class="s-card">
+        <div class="s-head">
+          <span class="s-title">Shipment Simulator</span>
+          <span class="s-tag">Fill all fields → Simulate</span>
+        </div>
+        <div class="s-body" style="padding:22px">
+
+          <div class="form-grp" style="margin-bottom:18px">
+            <div class="fs-title">01 · Shipment Setup</div>
+            <div class="form-row">
+              <div class="form-grp">
+                <label class="form-lbl">Sender</label>
+                <select class="form-ctrl" id="sim-sender"></select>
+              </div>
+              <div class="form-grp">
+                <label class="form-lbl">Receiver</label>
+                <select class="form-ctrl" id="sim-receiver"></select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-grp">
+                <label class="form-lbl">Product Name</label>
+                <input class="form-ctrl" id="sim-product" type="text" placeholder="e.g. Semiconductor Batch A">
+              </div>
+              <div class="form-grp">
+                <label class="form-lbl">Route / Region</label>
+                <input class="form-ctrl" id="sim-route" type="text" placeholder="e.g. Asia → Europe">
+              </div>
+            </div>
+            <div class="form-grp">
+              <label class="form-lbl">Shipment Type</label>
+              <div class="tog-group" id="tog-type">
+                <button class="tog-btn active" data-val="standard">Standard</button>
+                <button class="tog-btn" data-val="urgent">Urgent</button>
+                <button class="tog-btn" data-val="sensitive">Sensitive</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-grp" style="margin-bottom:18px">
+            <div class="fs-title">02 · Shipment Outcome</div>
+            <div class="form-grp">
+              <label class="form-lbl">Delivery Status</label>
+              <div class="tog-group" id="tog-delivery">
+                <button class="tog-btn active" data-val="on_time">On Time</button>
+                <button class="tog-btn" data-val="delayed">Delayed</button>
+                <button class="tog-btn" data-val="major_delay">Major Delay</button>
+                <button class="tog-btn" data-val="disputed">Disputed</button>
+              </div>
+            </div>
+            <div class="form-grp">
+              <label class="form-lbl">Condition Status</label>
+              <div class="tog-group" id="tog-condition">
+                <button class="tog-btn active" data-val="good">Good</button>
+                <button class="tog-btn" data-val="warning">Warning</button>
+                <button class="tog-btn" data-val="damaged">Damaged</button>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-grp">
+                <label class="form-lbl">Delay Hours</label>
+                <input class="form-ctrl" id="sim-delay" type="number" min="0" value="0">
+              </div>
+              <div class="form-grp">
+                <label class="form-lbl">False / Misleading Data?</label>
+                <div class="tog-group" id="tog-false">
+                  <button class="tog-btn active" data-val="no">No</button>
+                  <button class="tog-btn" data-val="yes">Yes — Flag It</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-grp" style="margin-bottom:4px">
+            <div class="fs-title">03 · Peer Feedback</div>
+            <div class="form-grp">
+              <label class="form-lbl">Rating</label>
+              <div class="star-row" id="star-row">
+                <button class="star-btn" data-val="1">★</button>
+                <button class="star-btn" data-val="2">★</button>
+                <button class="star-btn" data-val="3">★</button>
+                <button class="star-btn" data-val="4">★</button>
+                <button class="star-btn" data-val="5">★</button>
+              </div>
+            </div>
+            <div class="form-grp">
+              <label class="form-lbl">Feedback Note</label>
+              <textarea class="form-ctrl form-ta" id="sim-feedback" placeholder="Describe the shipment experience..."></textarea>
+            </div>
+            <div class="form-grp">
+              <label class="form-lbl">Quick Flags</label>
+              <div class="flags-row" id="flags-row">
+                <button class="flag-btn" data-val="smooth">✓ Smooth</button>
+                <button class="flag-btn" data-val="delayed">⏱ Delayed</button>
+                <button class="flag-btn" data-val="damaged">📦 Damaged</button>
+                <button class="flag-btn" data-val="comm">📡 Poor Comm.</button>
+                <button class="flag-btn" data-val="false_data">⚠ False Data</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="sim-btns">
+            <button class="btn-simulate" onclick="runSim()">⬕ Simulate Shipment</button>
+            <button class="btn-reset-sim" onclick="resetSim()">↺ Reset</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- RESULT PANEL -->
+      <div class="result-panel">
+        <div id="res-waiting" class="res-waiting">
+          <span class="res-wait-ico">⬕</span>
+          <div class="res-wait-txt">Configure the simulation and click <strong>Simulate Shipment</strong> to see how trust scores change in real time.</div>
+        </div>
+        <div id="res-content">
+          <div class="res-hdr">
+            <div class="res-ico" id="res-ico">✅</div>
+            <div>
+              <div class="res-hdr-title" id="res-title">Shipment Simulated</div>
+              <div class="res-hdr-sub" id="res-sub"></div>
+            </div>
+          </div>
+          <div id="res-scores"></div>
+          <div class="impact-bar" id="res-impact"></div>
+          <div class="res-msg" id="res-msg"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</main>
+
+<!-- NODE DRAWER -->
+<div id="node-drawer">
+  <button class="drawer-close" onclick="closeDrawer()">✕</button>
+  <div id="drawer-body"></div>
+</div>
+
+<!-- TOAST -->
+<div id="toast">
+  <span class="t-ico" id="t-ico">✅</span>
+  <span id="t-msg"></span>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════
+//  STATE & DATA
+// ═══════════════════════════════════════════════════
+
+const S = {
+  stakeholders: [
+    { id:1, name:'Nexus Logistics',  role:'Transporter',  region:'Asia Pacific',     score:92, onTime:97,  disputes:1,  ships:84,  avgRating:4.8 },
+    { id:2, name:'ArcMfg Co.',       role:'Manufacturer', region:'Europe',            score:67, onTime:78,  disputes:5,  ships:61,  avgRating:3.4 },
+    { id:3, name:'Orion Retail',     role:'Retailer',     region:'North America',     score:88, onTime:94,  disputes:2,  ships:112, avgRating:4.5 },
+    { id:4, name:'Titan Dist.',      role:'Distributor',  region:'Middle East',       score:45, onTime:62,  disputes:9,  ships:47,  avgRating:2.8 },
+    { id:5, name:'SwiftShip',        role:'Transporter',  region:'Southeast Asia',    score:78, onTime:88,  disputes:3,  ships:95,  avgRating:4.1 },
+    { id:6, name:'GreenSource',      role:'Manufacturer', region:'South Asia',        score:31, onTime:51,  disputes:14, ships:38,  avgRating:2.1 },
+    { id:7, name:'PrimeRetail',      role:'Retailer',     region:'Europe',            score:83, onTime:91,  disputes:2,  ships:76,  avgRating:4.3 },
+    { id:8, name:'CoastalDist',      role:'Distributor',  region:'Americas',          score:60, onTime:74,  disputes:6,  ships:53,  avgRating:3.2 },
+  ],
+  shipments: [
+    { id:'SHP-001', from:'Nexus Logistics',  to:'Orion Retail',   status:'on_time',    delay:0,  rating:5, when:'2h ago',  product:'Semiconductors' },
+    { id:'SHP-002', from:'ArcMfg Co.',       to:'SwiftShip',      status:'delayed',    delay:6,  rating:2, when:'5h ago',  product:'Raw Materials' },
+    { id:'SHP-003', from:'SwiftShip',        to:'Orion Retail',   status:'on_time',    delay:0,  rating:4, when:'8h ago',  product:'Consumer Goods' },
+    { id:'SHP-004', from:'GreenSource',      to:'Titan Dist.',    status:'major_delay',delay:48, rating:1, when:'12h ago', product:'Textiles' },
+    { id:'SHP-005', from:'Nexus Logistics',  to:'PrimeRetail',    status:'on_time',    delay:0,  rating:5, when:'1d ago',  product:'Electronics' },
+    { id:'SHP-006', from:'CoastalDist',      to:'PrimeRetail',    status:'delayed',    delay:12, rating:3, when:'1d ago',  product:'Apparel' },
+    { id:'SHP-007', from:'ArcMfg Co.',       to:'Nexus Logistics',status:'disputed',   delay:0,  rating:1, when:'2d ago',  product:'Machinery Parts' },
+    { id:'SHP-008', from:'Titan Dist.',      to:'PrimeRetail',    status:'delayed',    delay:18, rating:2, when:'2d ago',  product:'Pharma' },
+    { id:'SHP-009', from:'SwiftShip',        to:'Titan Dist.',    status:'on_time',    delay:0,  rating:4, when:'3d ago',  product:'Auto Parts' },
+    { id:'SHP-010', from:'GreenSource',      to:'CoastalDist',    status:'major_delay',delay:72, rating:1, when:'3d ago',  product:'Chemicals' },
+  ],
+  form: { type:'standard', delivery:'on_time', condition:'good', falseData:false, rating:3, flags:new Set() },
+  view: 'dashboard',
+};
+
+const EDGES = [
+  {from:1,to:3,count:24},{from:2,to:5,count:18},{from:5,to:3,count:31},
+  {from:2,to:1,count:12},{from:4,to:7,count:15},{from:6,to:4,count:9},
+  {from:6,to:8,count:11},{from:8,to:7,count:20},{from:1,to:7,count:8},
+  {from:5,to:4,count:6},{from:3,to:7,count:14},{from:2,to:8,count:7},
+];
+
+// ═══════════════════════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════════════════════
+
+function badge(score) {
+  if (score >= 85) return { label:'Trusted',   cls:'trusted',   color:'#5af77a' };
+  if (score >= 65) return { label:'Rising',    cls:'rising',    color:'#c8f75a' };
+  if (score >= 40) return { label:'Watchlist', cls:'watchlist', color:'#f7be5a' };
+  return              { label:'Critical',  cls:'critical',  color:'#f7675a' };
+}
+function statusPill(s) {
+  const m = { on_time:['On Time','sp-on'], delayed:['Delayed','sp-del'], major_delay:['Major Delay','sp-maj'], disputed:['Disputed','sp-dis'] };
+  const [l,c] = m[s]||['?',''];
+  return `<span class="s-pill ${c}">${l}</span>`;
+}
+function stars(n) { return '★'.repeat(n)+'☆'.repeat(5-n); }
+function clamp(v,a,b) { return Math.max(a,Math.min(b,v)); }
+function toast(msg, ico='✅') {
+  const el = document.getElementById('toast');
+  document.getElementById('t-ico').textContent = ico;
+  document.getElementById('t-msg').textContent = msg;
+  el.classList.add('show');
+  clearTimeout(el._t);
+  el._t = setTimeout(()=>el.classList.remove('show'), 3400);
+}
+function nextId() { return 'SHP-'+String(S.shipments.length+1).padStart(3,'0'); }
+
+// ═══════════════════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════════════════
+
+const VIEW_TITLES = { dashboard:'Dashboard', graph:'Trust Network Graph', simulate:'Shipment Simulator' };
+
+function navigate(view) {
+  if (S.view==='graph' && view!=='graph') gRunning = false;
+  S.view = view;
+
+  document.querySelectorAll('.sb-item').forEach(el=>el.classList.remove('active'));
+  const el = document.querySelector(`[data-view="${view}"]`);
+  if (el) el.classList.add('active');
+
+  document.querySelectorAll('.view').forEach(v=>v.classList.add('hidden'));
+  document.getElementById(`view-${view}`).classList.remove('hidden');
+
+  document.getElementById('page-title').textContent = VIEW_TITLES[view]||view;
+
+  if (view==='dashboard') renderDash();
+  if (view==='graph')     setTimeout(initGraph, 40);
+}
+
+// ═══════════════════════════════════════════════════
+//  DASHBOARD
+// ═══════════════════════════════════════════════════
+
+function renderDash() { renderKPIs(); renderStakeholders(); renderShipments(); renderPanels(); }
+
+function renderKPIs() {
+  const sk = S.stakeholders;
+  const avg = (sk.reduce((a,b)=>a+b.score,0)/sk.length).toFixed(1);
+  const risk = sk.filter(x=>x.score<40).length;
+  document.getElementById('kpi-row').innerHTML = `
+    <div class="kpi-card"><div class="kpi-ico">⬡</div><div class="kpi-lbl">Total Stakeholders</div><div class="kpi-num c-accent">${sk.length}</div><div class="kpi-sub">Across all network tiers</div></div>
+    <div class="kpi-card"><div class="kpi-ico">◈</div><div class="kpi-lbl">Total Shipments</div><div class="kpi-num c-white">${S.shipments.length}</div><div class="kpi-sub">Logged &amp; verified</div></div>
+    <div class="kpi-card"><div class="kpi-ico">◉</div><div class="kpi-lbl">Avg Reputation</div><div class="kpi-num c-green">${avg}</div><div class="kpi-sub">Network trust index</div></div>
+    <div class="kpi-card"><div class="kpi-ico">⚠</div><div class="kpi-lbl">High Risk</div><div class="kpi-num ${risk>0?'c-red':'c-green'}">${risk}</div><div class="kpi-sub">Score below 40 — Critical</div></div>
+  `;
+}
+
+function renderStakeholders() {
+  const sorted = [...S.stakeholders].sort((a,b)=>b.score-a.score);
+  document.getElementById('stk-grid').innerHTML = sorted.map(s => {
+    const b = badge(s.score);
+    return `
+      <div class="stk-card ${b.cls}" onclick="openDrawer(S.stakeholders.find(x=>x.id===${s.id}))" title="Click for details">
+        <div class="stk-top">
+          <div><div class="stk-name">${s.name}</div><div class="stk-meta">${s.role} · ${s.region}</div></div>
+          <span class="rep-badge ${b.cls}">${b.label}</span>
+        </div>
+        <div class="score-row">
+          <span class="score-big" style="color:${b.color}">${s.score}</span>
+          <span class="score-of">/ 100</span>
+        </div>
+        <div class="bar-bg" style="margin-bottom:10px">
+          <div class="bar-fill bf-${b.cls}" style="width:${s.score}%"></div>
+        </div>
+        <div class="stk-stats">
+          <div class="stk-stat"><div class="stk-sv">${s.onTime}%</div><div class="stk-sl">On-Time</div></div>
+          <div class="stk-stat"><div class="stk-sv">${s.disputes}</div><div class="stk-sl">Disputes</div></div>
+          <div class="stk-stat"><div class="stk-sv">${s.ships}</div><div class="stk-sl">Shipments</div></div>
+        </div>
+      </div>`;
+  }).join('');
+  document.getElementById('stk-tag').textContent = S.stakeholders.length+' active';
+}
+
+function renderShipments() {
+  document.getElementById('ship-tbody').innerHTML = S.shipments.slice(0,15).map(s=>`
+    <tr>
+      <td><span class="ship-id">${s.id}</span></td>
+      <td>${s.from}</td><td>${s.to}</td>
+      <td>${statusPill(s.status)}</td>
+      <td class="ts-dim">${s.delay>0?s.delay+'h':'—'}</td>
+      <td><span class="stars">${stars(s.rating)}</span></td>
+      <td class="ts-dim">${s.when}</td>
+    </tr>`).join('');
+  document.getElementById('ship-tag').textContent = S.shipments.length+' logged';
+}
+
+function renderPanels() {
+  const sorted = [...S.stakeholders].sort((a,b)=>b.score-a.score);
+  document.getElementById('top-list').innerHTML = sorted.slice(0,3).map((s,i)=>{
+    const b = badge(s.score);
+    return `<li class="panel-item">
+      <span class="p-rank">#${i+1}</span>
+      <span class="p-name">${s.name}<small>${s.role}</small></span>
+      <span class="p-score" style="color:${b.color}">${s.score}</span>
+    </li>`;
+  }).join('');
+  document.getElementById('watch-list').innerHTML = sorted.slice(-3).reverse().map((s)=>{
+    const b = badge(s.score);
+    return `<li class="panel-item">
+      <span class="p-rank" style="color:${b.color}">!</span>
+      <span class="p-name">${s.name}<small>${s.role}</small></span>
+      <span class="p-score" style="color:${b.color}">${s.score}</span>
+    </li>`;
+  }).join('');
+  const bestT = [...S.stakeholders].filter(s=>s.role==='Transporter').sort((a,b)=>b.score-a.score)[0];
+  const bestM = [...S.stakeholders].filter(s=>s.role==='Manufacturer').sort((a,b)=>b.score-a.score)[0];
+  const worst = sorted[sorted.length-1];
+  document.getElementById('rec-panel').innerHTML = `
+    <div class="rec-card">
+      <div class="rec-lbl">🚚 Best Transporter Now</div>
+      <div class="rec-val">${bestT?.name||'—'}</div>
+      <div class="rec-sub">Score ${bestT?.score} · ${bestT?.onTime}% on-time</div>
+    </div>
+    <div class="rec-card">
+      <div class="rec-lbl">🏭 Best Manufacturer</div>
+      <div class="rec-val">${bestM?.name||'—'}</div>
+      <div class="rec-sub">Score ${bestM?.score} · ${bestM?.disputes} disputes</div>
+    </div>
+    <div class="rec-card" style="border-color:rgba(247,103,90,0.22)">
+      <div class="rec-lbl" style="color:var(--red)">⚠ Highest Risk</div>
+      <div class="rec-val" style="color:var(--red)">${worst?.name||'—'}</div>
+      <div class="rec-sub">${worst?.score<40?'Critical — avoid for new shipments':'Monitor closely'}</div>
+    </div>`;
+}
+
+// ═══════════════════════════════════════════════════
+//  TRUST GRAPH — Canvas Force-Directed
+// ═══════════════════════════════════════════════════
+
+let gNodes = [];
+let gRunning = false;
+let gRAF = null;
+let gHovered = null;
+let gSelected = null;
+
+function initGraph() {
+  const canvas = document.getElementById('trust-canvas');
+  const wrap = canvas.parentElement;
+  const dpr = window.devicePixelRatio || 1;
+  const W = wrap.clientWidth;
+  const H = wrap.clientHeight;
+  canvas.width = W * dpr;
+  canvas.height = H * dpr;
+  canvas.style.width = W+'px';
+  canvas.style.height = H+'px';
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  if (gNodes.length === 0) {
+    const cx = W/2, cy = H/2, r = Math.min(W,H)*0.32;
+    gNodes = S.stakeholders.map((s,i) => {
+      const a = (i/S.stakeholders.length)*Math.PI*2;
+      return { id:s.id, x:cx+Math.cos(a)*r, y:cy+Math.sin(a)*r, vx:0, vy:0, fx:0, fy:0 };
+    });
+    for (let t=0;t<180;t++) tick(W,H);
+  }
+
+  gRunning = false;
+  if (gRAF) cancelAnimationFrame(gRAF);
+  gRunning = true;
+
+  canvas.onmousemove = e => {
+    const rect = canvas.getBoundingClientRect();
+    const mx = e.clientX-rect.left, my = e.clientY-rect.top;
+    let near=null, minD=Infinity;
+    for (const n of gNodes) {
+      const s = S.stakeholders.find(x=>x.id===n.id);
+      const r = nodeR(s.score);
+      const d = Math.hypot(n.x-mx, n.y-my);
+      if (d<r+10 && d<minD) { minD=d; near=n; }
+    }
+    gHovered = near;
+    canvas.style.cursor = near ? 'pointer' : 'default';
+  };
+  canvas.onclick = e => {
+    if (gHovered) { gSelected=gHovered; openDrawer(S.stakeholders.find(x=>x.id===gHovered.id)); }
+    else          { gSelected=null; closeDrawer(); }
+  };
+
+  function loop() {
+    if (!gRunning) return;
+    tick(W,H); draw(ctx,W,H);
+    gRAF = requestAnimationFrame(loop);
+  }
+  loop();
+}
+
+function nodeR(score) { return 14+(score/100)*18; }
+
+function tick(W,H) {
+  const spring=0.009, repulsion=3800, target=165, damping=0.82, center=0.012;
+  const cx=W/2, cy=H/2;
+  for (const n of gNodes) { n.fx=0; n.fy=0; }
+  for (let i=0;i<gNodes.length;i++) {
+    for (let j=i+1;j<gNodes.length;j++) {
+      const a=gNodes[i],b=gNodes[j];
+      const dx=a.x-b.x,dy=a.y-b.y;
+      const d=Math.sqrt(dx*dx+dy*dy)||1;
+      const f=repulsion/(d*d);
+      const fx=(dx/d)*f,fy=(dy/d)*f;
+      a.fx+=fx;a.fy+=fy;b.fx-=fx;b.fy-=fy;
+    }
+  }
+  for (const e of EDGES) {
+    const a=gNodes.find(n=>n.id===e.from),b=gNodes.find(n=>n.id===e.to);
+    if (!a||!b) continue;
+    const dx=b.x-a.x,dy=b.y-a.y;
+    const d=Math.sqrt(dx*dx+dy*dy)||1;
+    const f=(d-target)*spring;
+    const fx=(dx/d)*f,fy=(dy/d)*f;
+    a.fx+=fx;a.fy+=fy;b.fx-=fx;b.fy-=fy;
+  }
+  for (const n of gNodes) {
+    n.fx+=(cx-n.x)*center;n.fy+=(cy-n.y)*center;
+    n.vx=(n.vx+n.fx)*damping;n.vy=(n.vy+n.fy)*damping;
+    n.x+=n.vx;n.y+=n.vy;
+    n.x=clamp(n.x,65,W-65);n.y=clamp(n.y,65,H-65);
+  }
+}
+
+function draw(ctx,W,H) {
+  ctx.clearRect(0,0,W,H);
+  for (const e of EDGES) {
+    const a=gNodes.find(n=>n.id===e.from),b=gNodes.find(n=>n.id===e.to);
+    if (!a||!b) continue;
+    const isSel = gSelected&&(e.from===gSelected.id||e.to===gSelected.id);
+    ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y);
+    ctx.strokeStyle = isSel ? 'rgba(200,247,90,0.5)' : 'rgba(255,255,255,0.07)';
+    ctx.lineWidth   = isSel ? Math.max(1.5,e.count/10) : Math.max(0.5,e.count/14);
+    ctx.stroke();
+  }
+  for (const nd of gNodes) {
+    const s = S.stakeholders.find(x=>x.id===nd.id);
+    if (!s) continue;
+    const b   = badge(s.score);
+    const r   = nodeR(s.score);
+    const col = b.color;
+    const isSel = gSelected&&gSelected.id===nd.id;
+    const isHov = gHovered&&gHovered.id===nd.id;
+    const g = ctx.createRadialGradient(nd.x,nd.y,0,nd.x,nd.y,r*2.8);
+    g.addColorStop(0, col+(isSel?'44':'14'));
+    g.addColorStop(1, 'transparent');
+    ctx.beginPath(); ctx.arc(nd.x,nd.y,r*2.8,0,Math.PI*2);
+    ctx.fillStyle=g; ctx.fill();
+    ctx.beginPath(); ctx.arc(nd.x,nd.y,r,0,Math.PI*2);
+    ctx.fillStyle = col+(isSel?'30':'10');
+    ctx.fill();
+    ctx.strokeStyle = col;
+    ctx.lineWidth = isSel?3:isHov?2.5:1.5;
+    ctx.stroke();
+    const fs = Math.max(10,r*0.52);
+    ctx.fillStyle = '#f4f0e8';
+    ctx.font = `bold ${fs}px 'DM Mono', monospace`;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(s.score, nd.x, nd.y);
+    ctx.fillStyle = isSel ? '#f4f0e8' : '#666';
+    ctx.font = `${isSel?'600 ':''}11px 'DM Sans', sans-serif`;
+    ctx.textBaseline = 'top';
+    ctx.fillText(s.name, nd.x, nd.y+r+7);
+    ctx.fillStyle = '#444';
+    ctx.font = '9px DM Sans, sans-serif';
+    ctx.fillText(s.role, nd.x, nd.y+r+20);
+  }
+}
+
+function openDrawer(s) {
+  const b = badge(s.score);
+  const connected = EDGES.filter(e=>e.from===s.id||e.to===s.id).map(e=>{
+    const other = S.stakeholders.find(x=>x.id===(e.from===s.id?e.to:e.from));
+    return other ? `${other.name} (${e.count} shipments)` : '';
+  }).filter(Boolean);
+  document.getElementById('drawer-body').innerHTML = `
+    <div style="margin-bottom:18px">
+      <span class="rep-badge ${b.cls}" style="margin-bottom:10px;display:inline-block">${b.label}</span>
+      <div style="font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:900;margin-top:6px">${s.name}</div>
+      <div style="font-size:0.78rem;color:var(--muted2);margin-top:4px">${s.role} · ${s.region}</div>
+    </div>
+    <div style="text-align:center;padding:18px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin-bottom:14px">
+      <div style="font-family:'Playfair Display',serif;font-size:3rem;font-weight:900;color:${b.color};line-height:1">${s.score}</div>
+      <div style="font-size:0.62rem;color:var(--muted);letter-spacing:0.06em;text-transform:uppercase;margin-top:4px">Trust Score</div>
+    </div>
+    <div class="d-section">
+      <div class="d-sec-title">Performance</div>
+      <div class="d-row"><span class="d-lbl">On-Time Rate</span><span class="d-val">${s.onTime}%</span></div>
+      <div class="d-row"><span class="d-lbl">Total Shipments</span><span class="d-val">${s.ships}</span></div>
+      <div class="d-row"><span class="d-lbl">Disputes</span><span class="d-val" style="color:${s.disputes>5?'var(--red)':'var(--white)'}">${s.disputes}</span></div>
+      <div class="d-row"><span class="d-lbl">Avg Rating</span><span class="d-val">${s.avgRating} / 5</span></div>
+    </div>
+    <div class="d-section">
+      <div class="d-sec-title">Connected Partners (${connected.length})</div>
+      ${connected.map(c=>`<div class="d-row"><span class="d-lbl" style="font-size:0.76rem">${c}</span></div>`).join('')}
+    </div>
+    <div style="margin-top:20px">
+      <button class="btn-simulate" style="width:100%;font-size:0.82rem;padding:10px" onclick="navigate('simulate');closeDrawer()">Simulate with this Stakeholder</button>
+    </div>`;
+  document.getElementById('node-drawer').classList.add('open');
+}
+function closeDrawer() {
+  document.getElementById('node-drawer').classList.remove('open');
+}
+
+// ═══════════════════════════════════════════════════
+//  SIMULATION
+// ═══════════════════════════════════════════════════
+
+function initSim() {
+  const opts = S.stakeholders.map(s=>`<option value="${s.id}">${s.name} (${s.role})</option>`).join('');
+  document.getElementById('sim-sender').innerHTML = opts;
+  document.getElementById('sim-receiver').innerHTML = opts;
+  if (S.stakeholders.length>1) document.getElementById('sim-receiver').value = S.stakeholders[1].id;
+
+  document.querySelectorAll('[id^="tog-"]').forEach(grp=>{
+    grp.querySelectorAll('.tog-btn').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        grp.querySelectorAll('.tog-btn').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        const v = btn.dataset.val;
+        if (grp.id==='tog-type')     S.form.type     = v;
+        if (grp.id==='tog-delivery') S.form.delivery = v;
+        if (grp.id==='tog-condition')S.form.condition= v;
+        if (grp.id==='tog-false')    S.form.falseData= v==='yes';
+      });
+    });
+  });
+
+  function setRating(n) {
+    S.form.rating = n;
+    document.querySelectorAll('.star-btn').forEach(b=>{
+      b.classList.toggle('lit', parseInt(b.dataset.val)<=n);
+    });
+  }
+  document.querySelectorAll('.star-btn').forEach(b=>{
+    b.addEventListener('click',()=>setRating(parseInt(b.dataset.val)));
+  });
+  setRating(3);
+
+  document.querySelectorAll('.flag-btn').forEach(b=>{
+    b.addEventListener('click',()=>{
+      b.classList.toggle('active');
+      const v = b.dataset.val;
+      S.form.flags.has(v) ? S.form.flags.delete(v) : S.form.flags.add(v);
+    });
+  });
+}
+
+function computeDelta() {
+  const f = S.form; let d = 0;
+  if (f.delivery==='on_time')    d+=5;
+  if (f.delivery==='delayed')    d-=5;
+  if (f.delivery==='major_delay')d-=10;
+  if (f.delivery==='disputed')   d-=15;
+  if (f.condition==='damaged')   d-=10;
+  if (f.falseData)               d-=20;
+  if (f.rating>=4)               d+=3;
+  if (f.rating<=2)               d-=3;
+  if (f.delivery==='on_time'&&f.condition==='good'&&f.rating===5) d+=2;
+  return d;
+}
+
+function runSim() {
+  const sid = parseInt(document.getElementById('sim-sender').value);
+  const rid = parseInt(document.getElementById('sim-receiver').value);
+  if (sid===rid) { toast('Sender and receiver must be different','⚠️'); return; }
+  const sender   = S.stakeholders.find(s=>s.id===sid);
+  const receiver = S.stakeholders.find(s=>s.id===rid);
+  if (!sender||!receiver) { toast('Select valid sender & receiver','⚠️'); return; }
+
+  const delta    = computeDelta();
+  const oldSend  = sender.score;
+  const oldRecv  = receiver.score;
+
+  sender.score = clamp(sender.score+delta, 0, 100);
+  if (S.form.delivery==='disputed') receiver.score = clamp(receiver.score-5, 0, 100);
+
+  sender.ships++;
+  if (S.form.delivery==='on_time')    sender.onTime = Math.min(100,Math.round(sender.onTime*0.96+4));
+  if (S.form.delivery==='delayed')    sender.onTime = Math.max(0,Math.round(sender.onTime*0.96));
+  if (S.form.delivery==='major_delay')sender.onTime = Math.max(0,Math.round(sender.onTime*0.92));
+  if (S.form.delivery==='disputed')   sender.disputes++;
+
+  const product = document.getElementById('sim-product').value.trim()||'Unspecified Goods';
+  S.shipments.unshift({
+    id:nextId(), from:sender.name, to:receiver.name,
+    status:S.form.delivery,
+    delay:parseInt(document.getElementById('sim-delay').value)||0,
+    rating:S.form.rating, when:'just now', product
+  });
+
+  showResult(sender, receiver, oldSend, oldRecv, delta);
+  toast(`${sender.name} score → ${sender.score}`, delta>=0?'✅':'⚠️');
+}
+
+function showResult(sender, receiver, oldS, oldR, delta) {
+  document.getElementById('res-waiting').style.display = 'none';
+  const rc = document.getElementById('res-content');
+  rc.classList.add('show');
+
+  const ds = sender.score - oldS;
+  const dr = receiver.score - oldR;
+  const oldBadge = badge(oldS);
+  const newBadge = badge(sender.score);
+  const badgeChanged = oldBadge.cls !== newBadge.cls;
+
+  let impCls, impTxt;
+  if (delta>=5)       { impCls='ib-pos'; impTxt='↑ Positive Impact — Trust Improved'; }
+  else if (delta<=-10){ impCls='ib-neg'; impTxt='↓ Severe Negative Impact'; }
+  else if (delta<0)   { impCls='ib-neg'; impTxt='↓ Negative Impact — Score Penalized'; }
+  else                { impCls='ib-neu'; impTxt='→ Neutral Impact'; }
+
+  const msgs = {
+    on_time:'Shipment arrived on schedule. Reliable performance has been rewarded with a trust boost.',
+    delayed:'Late delivery detected. Score has been penalized to reflect unreliable timing.',
+    major_delay:"Critical delay logged. This has severely impacted the stakeholder's standing in the network.",
+    disputed:'Dispute filed. Maximum penalty applied — both parties\' scores are impacted.',
+  };
+
+  let alerts = '';
+  if (S.form.falseData)                       alerts+=`<div class="res-alert ra-danger">⚠ False data reported — maximum penalty (−20) applied.</div>`;
+  if (sender.score<40 && oldS>=40)            alerts+=`<div class="res-alert ra-danger">🔴 Stakeholder dropped into Critical status.</div>`;
+  if (sender.score>=85 && oldS<85)            alerts+=`<div class="res-alert ra-success">🟢 Stakeholder achieved Trusted status!</div>`;
+  if (sender.score>=65 && oldS<65 && !alerts) alerts+=`<div class="res-alert ra-success">↑ Stakeholder promoted to Rising tier.</div>`;
+
+  document.getElementById('res-ico').textContent   = delta>=0?'✅':'⚠️';
+  document.getElementById('res-title').textContent = 'Shipment Simulated';
+  document.getElementById('res-sub').textContent   = `${S.shipments[0].id} · ${new Date().toLocaleTimeString()}`;
+
+  const dc = s => s>0?'gain':s<0?'loss':'same';
+  document.getElementById('res-scores').innerHTML = `
+    <div class="sc-card">
+      <div class="sc-name">${sender.name} <span style="font-weight:400;font-size:0.62rem;color:var(--muted)">(Sender)</span></div>
+      <div class="sc-role-txt">${sender.role} · ${sender.region}</div>
+      <div class="sc-scores">
+        <span class="sc-old">${oldS}</span>
+        <span class="sc-arr">→</span>
+        <span class="sc-new ${dc(ds)}">${sender.score}</span>
+        <span class="sc-delta ${dc(ds)}">${ds>0?'+':''}${ds}</span>
+      </div>
+      ${badgeChanged?`<div class="badge-change">Badge: <span class="rep-badge ${oldBadge.cls}" style="font-size:0.6rem">${oldBadge.label}</span> <span style="margin:0 5px;color:var(--muted)">→</span> <span class="rep-badge ${newBadge.cls}" style="font-size:0.6rem">${newBadge.label}</span></div>`:''}
+      ${alerts}
+    </div>
+    ${dr!==0?`<div class="sc-card">
+      <div class="sc-name">${receiver.name} <span style="font-weight:400;font-size:0.62rem;color:var(--muted)">(Receiver)</span></div>
+      <div class="sc-role-txt">${receiver.role} · ${receiver.region}</div>
+      <div class="sc-scores">
+        <span class="sc-old">${oldR}</span><span class="sc-arr">→</span>
+        <span class="sc-new ${dc(dr)}">${receiver.score}</span>
+        <span class="sc-delta ${dc(dr)}">${dr>0?'+':''}${dr}</span>
+      </div>
+    </div>`:''}`;
+
+  const imp = document.getElementById('res-impact');
+  imp.className = `impact-bar ${impCls}`;
+  imp.textContent = impTxt;
+  document.getElementById('res-msg').textContent = msgs[S.form.delivery]||'Simulation complete.';
+
+  if (S.view==='dashboard') renderDash();
+}
+
+function resetSim() {
+  document.getElementById('sim-product').value = '';
+  document.getElementById('sim-route').value = '';
+  document.getElementById('sim-feedback').value = '';
+  document.getElementById('sim-delay').value = '0';
+  document.querySelectorAll('[id^="tog-"]').forEach(g=>{
+    const btns = g.querySelectorAll('.tog-btn');
+    btns.forEach(b=>b.classList.remove('active'));
+    btns[0].classList.add('active');
+  });
+  document.querySelectorAll('.flag-btn').forEach(b=>b.classList.remove('active'));
+  S.form = { type:'standard', delivery:'on_time', condition:'good', falseData:false, rating:3, flags:new Set() };
+  document.querySelectorAll('.star-btn').forEach(b=>{
+    b.classList.toggle('lit', parseInt(b.dataset.val)<=3);
+  });
+  document.getElementById('res-waiting').style.display = '';
+  document.getElementById('res-content').classList.remove('show');
+  toast('Form reset','🔄');
+}
+
+// ═══════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════
+
+document.addEventListener('DOMContentLoaded', () => {
+  renderDash();
+  initSim();
+  const h = location.hash.replace('#','');
+  if (['dashboard','graph','simulate'].includes(h)) navigate(h);
+});
+window.addEventListener('hashchange', () => {
+  const h = location.hash.replace('#','');
+  if (['dashboard','graph','simulate'].includes(h)) navigate(h);
+});
+window.addEventListener('resize', () => {
+  if (S.view==='graph') { gNodes=[]; initGraph(); }
+});
+</script>
+</body>
+</html>
