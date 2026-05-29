@@ -1,144 +1,96 @@
-# Axiom Labs — Trust-Driven Supply Chain Platform
+# ChainX — Reputation-Driven Supply Chain with Self-Evolving Trust Graph
 
-> A reputation-first supply chain intelligence dashboard. Every shipment shapes a stakeholder's trust score — live, transparent, and actionable.
+![HTML](https://img.shields.io/badge/HTML%2FJS%2FCSS-Zero%20Dependencies-e34c26?style=flat-square)
+![Live](https://img.shields.io/badge/Live-GitHub%20Pages-00dcc8?style=flat-square)
+![Version](https://img.shields.io/badge/version-1.0.0-blue?style=flat-square)
 
-![Axiom Labs](https://img.shields.io/badge/Axiom%20Labs-v1.0.0-00dcc8?style=for-the-badge)
-![HTML](https://img.shields.io/badge/HTML-Pure%20Frontend-e34c26?style=for-the-badge)
-![No Dependencies](https://img.shields.io/badge/Dependencies-Zero-2ecc71?style=for-the-badge)
+A supply chain intelligence dashboard where every shipment shapes a stakeholder's **trust score** in real-time. Built as a zero-dependency, pure-frontend system — open `index.html` in any browser and it runs.
 
----
-
-## 🚀 Live Demo
-
-Open `index.html` in any browser — no server, no install, no dependencies.
+> **Live demo:** [itsmilindsahu.github.io/ChainX](https://itsmilindsahu.github.io/ChainX/)
 
 ---
 
-## 📁 File Structure
+## Concept
+
+Traditional supply chain tools track logistics. ChainX tracks **trust**. Each stakeholder (supplier, transporter, warehouse, retailer) has a reputation score that updates dynamically based on shipment outcomes, delivery conditions, quality ratings, and fraud flags — surfacing the best partners and flagging unreliable ones before problems escalate.
+
+---
+
+## System Design
 
 ```
-axiom-labs/
-├── index.html        ← Landing page (start here)
-├── app.html          ← Main application (dashboard + graph + simulator)
-└── README.md
+Shipment Event (form input)
+        │
+        ▼
+┌─────────────────────────────────────────┐
+│         Trust Score Engine (JS)          │
+│                                          │
+│  Δ score = f(outcome, condition,         │
+│             rating, flags, lateness)     │
+│                                          │
+│  Rules:                                  │
+│  • Delivered on-time, good condition:   │
+│    +weight                               │
+│  • Late / damaged / flagged:            │
+│    −weight (severity-scaled)            │
+│  • Score clamped [0, 100]               │
+│  • Exponential moving average smoothing │
+└──────────────────┬──────────────────────┘
+                   │  updated scores
+                   ▼
+┌─────────────────────────────────────────┐
+│      Force-Directed Trust Graph          │
+│  (D3.js / vanilla Canvas)               │
+│                                          │
+│  • Nodes = stakeholders                 │
+│  • Node size ∝ trust score              │
+│  • Node color:                          │
+│    green (>70) / amber (40–70) /        │
+│    red (<40)                            │
+│  • Edges = active supply relationships  │
+│  • Edge weight ∝ shipment volume        │
+└──────────────────┬──────────────────────┘
+                   │
+                   ▼
+┌─────────────────────────────────────────┐
+│      Smart Recommendation Engine        │
+│  Rule-based partner suggestions:        │
+│  • Best supplier by category            │
+│  • Flag high-risk links                 │
+│  • Surface underused high-trust nodes   │
+└─────────────────────────────────────────┘
 ```
 
 ---
 
-## ✨ Features
+## Features
 
-| Feature | Description |
+| Feature | Implementation |
 |---|---|
-| **Dynamic Reputation** | Trust scores update instantly on every simulated shipment |
-| **Live Trust Graph** | Force-directed network graph — nodes sized & colored by score |
-| **Shipment Simulator** | Full form with outcome, condition, rating, flags → score recalculation |
-| **Smart Recommendations** | Rule-based best partner suggestions surfaced from live data |
-| **Stakeholder Drawer** | Click any node or card to see full stakeholder profile |
-| **Toast + Flash** | Visual feedback on every score change (green/red flash, toast notification) |
+| Dynamic trust scoring | JS scoring engine with configurable weights |
+| Live trust graph | Force-directed network, nodes sized & coloured by score |
+| Shipment simulator | Full form: outcome, condition, rating, flags |
+| Smart recommendations | Rule-based best-partner surfacing from live graph data |
+| Stakeholder drawer | Per-node history, score timeline, shipment log |
+| Zero dependencies | Pure HTML/CSS/JS — no build step, no npm |
 
 ---
 
-## 🖥️ Pages
-
-### Landing Page (`index.html`)
-- Hero with animated tagline
-- Feature highlights
-- Live dashboard mockup preview
-- "Why Axiom Labs" comparison section
-- Footer with nav links
-
-### App (`app.html`)
-Three views accessible from the sidebar:
-
-1. **Dashboard** — KPI summary cards, stakeholder grid, recent shipments table, top/watchlist panels, recommendations
-2. **Trust Graph** — Interactive canvas force-directed graph; click any node to open detail drawer
-3. **Simulate** — Full shipment simulation form with live result panel
-
----
-
-## 🧮 Reputation Logic
+## Files
 
 ```
-Base Score: 50
-
-Delivery:
-  On Time      → +5
-  Delayed      → -5
-  Major Delay  → -10
-  Disputed     → -15
-
-Condition:
-  Damaged      → -10
-
-Rating:
-  4 or 5 stars → +3
-  1 or 2 stars → -3
-
-False Data:   → -20
-
-Bonus (On Time + Good + Rating 5) → +2
-
-Range: 0 – 100
+ChainX/
+├── index.html   ← Landing page
+└── app.html     ← Main dashboard (trust graph + simulator + recommendations)
 ```
 
-**Badge Thresholds:**
-- 🟢 `85+` → **Trusted**
-- 🔵 `65–84` → **Rising**
-- 🟡 `40–64` → **Watchlist**
-- 🔴 `<40` → **Critical**
-
 ---
 
-## 🎯 Demo Scenarios
-
-### Scenario 1 — Good Transaction
-1. Go to **Simulate**
-2. Sender: `Nexus Logistics`, Receiver: `Orion Retail`
-3. Status: On Time · Condition: Good · Rating: 5★
-4. Hit **Simulate Shipment** → score increases, badge may upgrade
-
-### Scenario 2 — Delayed Shipment
-1. Sender: `ArcMfg Co.`, Receiver: `SwiftShip`
-2. Status: Delayed · Rating: 2★ · Delay Hours: 12
-3. Score drops, stakeholder may enter Watchlist
-
-### Scenario 3 — Fraud Behavior
-1. Sender: `GreenSource`, any Receiver
-2. Status: Disputed · False Data: Yes · Rating: 1★
-3. Maximum penalty — node turns red, removed from recommendations
-
----
-
-## 🛠️ Tech Stack
-
-- **Pure HTML/CSS/JS** — zero build tools, zero dependencies
-- **Canvas API** — trust graph rendered with force-directed simulation
-- **Google Fonts** — Syne (display) + DM Mono (data) + Outfit (body)
-- **In-memory state** — all data lives in a JS object, updates propagate instantly
-
----
-
-## 📦 Deploy to GitHub Pages
-
-1. Push both files to a GitHub repo
-2. Go to **Settings → Pages**
-3. Set source to `main` branch, root `/`
-4. Your site will be live at `https://<username>.github.io/<repo>/`
-
----
-
-## 🏗️ Local Usage
+## Running Locally
 
 ```bash
-# Option 1: Just open directly
+# No install needed — just open in browser
 open index.html
-
-# Option 2: Serve locally (optional, for strict CORS environments)
-npx serve .
 # or
-python3 -m http.server 8080
+python -m http.server 8080
 ```
-
----
-
-Built with purpose. Reputation is the new currency of supply chains.
